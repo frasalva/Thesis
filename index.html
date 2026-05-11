@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Field Unit · Subject 0427 · Black-headed Gull</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg-deep:   #0f0d0c;
+    --bg-page:   #181513;
+    --bg-rise:   #221d19;
+    --glass:     rgba(18, 15, 13, 0.72);
+    --glass-2:   rgba(28, 24, 20, 0.55);
+    --line:      rgba(244, 237, 224, 0.10);
+    --line-hi:   rgba(244, 237, 224, 0.22);
+    --ink:       #f4ede0;
+    --ink-2:     rgba(244, 237, 224, 0.62);
+    --ink-3:     rgba(244, 237, 224, 0.38);
+    --amber:     #f5b13c;
+    --amber-2:   #ffd07a;
+    --amber-glow:rgba(245, 177, 60, 0.45);
+    --signal:    #c8f562;
+    --crit:      #ff6a4d;
+
+    --display: "Fraunces", "Times New Roman", serif;
+    --mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --ease: cubic-bezier(.22, .61, .36, 1);
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+
+    /* Bird hot-zone in normalized video coordinates (0..1)
+       Video is 824x1028. Bird bounding box approx x:510-680 y:215-345 */
+    --bird-cx: 71.6%;
+    --bird-cy: 27.5%;
+
+    /* Active view aspect ratio — updated by JS when stepping through the gallery */
+    --ar-w: 824;
+    --ar-h: 1028;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    font-family: var(--mono);
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 800px at 70% -10%, #2a221c 0%, transparent 60%),
+      radial-gradient(900px 700px at -10% 110%, #1d1614 0%, transparent 55%),
+      var(--bg-page);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+
+  /* Subtle film grain across whole page */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    z-index: 200;
+  }
+
+  .page {
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 18px clamp(16px, 3vw, 32px);
+    gap: 14px;
+  }
+
+  /* ---------- header ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brand-mark {
+    width: 22px; height: 22px;
+    border: 1px solid var(--amber);
+    border-radius: 50%;
+    position: relative;
+    flex: none;
+  }
+  .brand-mark::before, .brand-mark::after {
+    content: ""; position: absolute; inset: 0;
+    border-radius: 50%;
+  }
+  .brand-mark::before {
+    border: 1px dashed rgba(245, 177, 60, 0.6);
+    transform: scale(1.55);
+    animation: spin 22s linear infinite;
+  }
+  .brand-mark::after {
+    width: 4px; height: 4px;
+    background: var(--amber);
+    border-radius: 50%;
+    inset: auto; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 0 8px var(--amber-glow);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .brand-text { line-height: 1.25; }
+  .brand-text strong {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-transform: none;
+    display: block;
+  }
+  .brand-text span { color: var(--ink-3); font-size: 10px; }
+
+  .top-meta {
+    display: flex; align-items: center; gap: 22px;
+  }
+  .top-meta .pill {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .top-meta .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--signal);
+    box-shadow: 0 0 8px rgba(200, 245, 98, 0.7);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .top-meta .num { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* ---------- stage / video ---------- */
+  .stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 0;
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: var(--ar-w) / var(--ar-h);
+    /* size frame to fit available area while keeping aspect ratio:
+       lesser of (available height) and (available width × inverse ratio) */
+    height: min(
+      calc(100dvh - 56px - 30px - 36px - 28px),     /* viewport - topbar - footer - vert pad - gaps */
+      calc((100dvw - 32px) * var(--ar-h) / var(--ar-w))  /* viewport width minus horiz pad, scaled by ratio */
+    );
+    max-width: 100%;
+    background: #000;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px var(--line-hi),
+      0 30px 80px -30px rgba(0,0,0,0.8),
+      inset 0 0 60px rgba(0,0,0,0.45);
+    cursor: crosshair;
+    isolation: isolate;
+  }
+
+  /* The image / video layers */
+  .layer {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  /* JS toggles which set is active per view */
+  .frame.is-image .layer-video { display: none; }
+  .frame.is-video .layer-image { display: none; }
+
+  /* Bottom layer: this is the one whose colors invert on hover */
+  .layer-invert {
+    z-index: 1;
+    transition:
+      filter 0.55s var(--ease),
+      transform 0.6s var(--ease);
+  }
+  .frame.tracking .layer-invert {
+    filter: invert(1) hue-rotate(180deg) saturate(0.55) contrast(1.08) brightness(0.92);
+  }
+
+  /* Top layer: same video, masked to the bird silhouette so it stays
+     in normal color while the bottom layer is inverted */
+  .layer-bird {
+    z-index: 2;
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 824 1028' preserveAspectRatio='none'><path fill='white' d='M514 272 Q508 250 528 245 Q540 240 552 241 L553 224 Q562 214 575 216 Q588 220 588 236 Q587 250 591 253 Q616 256 638 268 Q660 279 672 293 Q678 298 666 304 Q638 313 608 317 Q590 320 582 321 L586 344 L572 345 L569 322 Q553 322 540 320 Q522 314 514 302 Q506 285 514 272 Z'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 824 1028' preserveAspectRatio='none'><path fill='white' d='M514 272 Q508 250 528 245 Q540 240 552 241 L553 224 Q562 214 575 216 Q588 220 588 236 Q587 250 591 253 Q616 256 638 268 Q660 279 672 293 Q678 298 666 304 Q638 313 608 317 Q590 320 582 321 L586 344 L572 345 L569 322 Q553 322 540 320 Q522 314 514 302 Q506 285 514 272 Z'/></svg>");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease);
+    /* Slight glow around the segmentation */
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  .frame.tracking .layer-bird {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(245, 177, 60, 0.55));
+  }
+
+  /* The visible segmentation outline (drawn separately so it looks like
+     a generated AI mask, with dashed amber edges) */
+  .seg-outline {
+    position: absolute; inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease);
+  }
+  .seg-outline path {
+    fill: rgba(245, 177, 60, 0.06);
+    stroke: var(--amber);
+    stroke-width: 1.4;
+    stroke-dasharray: 4 4;
+    filter: drop-shadow(0 0 4px var(--amber-glow));
+    animation: dashflow 18s linear infinite;
+  }
+  @keyframes dashflow { to { stroke-dashoffset: -200; } }
+  .frame.tracking .seg-outline { opacity: 1; }
+
+  /* Scanlines that appear over the inverted area on hover */
+  .scanlines {
+    position: absolute; inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(245, 177, 60, 0.05) 0px,
+      rgba(245, 177, 60, 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    opacity: 0;
+    transition: opacity 0.4s var(--ease);
+    mix-blend-mode: screen;
+  }
+  .frame.tracking .scanlines { opacity: 0.7; }
+
+  /* Frame corner brackets (always faintly visible, sharper on hover) */
+  .corners {
+    position: absolute; inset: 14px;
+    z-index: 4;
+    pointer-events: none;
+  }
+  .corners::before,
+  .corners::after,
+  .corners > i:first-child,
+  .corners > i:last-child {
+    content: "";
+    position: absolute;
+    width: 22px; height: 22px;
+    border: 1.5px solid var(--ink-2);
+    transition: border-color 0.4s var(--ease), width 0.4s var(--ease), height 0.4s var(--ease);
+  }
+  .corners::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+  .corners::after  { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+  .corners > i:first-child { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+  .corners > i:last-child  { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+  .frame.tracking .corners::before,
+  .frame.tracking .corners::after,
+  .frame.tracking .corners > i:first-child,
+  .frame.tracking .corners > i:last-child {
+    border-color: var(--amber);
+    width: 28px; height: 28px;
+  }
+
+  /* "READY" hint pip in the corner — subtle indicator that the system is alive */
+  .standby {
+    position: absolute;
+    bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: var(--glass);
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex; align-items: center; gap: 10px;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .standby::before {
+    content: "";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-2);
+    animation: blink 2.2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+  .frame.tracking .standby { opacity: 0; transform: translate(-50%, 8px); }
+
+  /* Reticle around the bird */
+  .reticle {
+    position: absolute;
+    left: var(--bird-cx); top: var(--bird-cy);
+    transform: translate(-50%, -50%);
+    width: 130px; height: 130px;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease), width 0.4s var(--ease), height 0.4s var(--ease);
+  }
+  .frame.tracking .reticle { opacity: 1; }
+  .reticle .ring {
+    position: absolute; inset: 0;
+    border: 1px solid var(--amber);
+    border-radius: 50%;
+    animation: ringpulse 2.4s ease-in-out infinite;
+  }
+  .reticle .ring.r2 {
+    inset: -18px;
+    border-style: dashed;
+    border-color: rgba(245, 177, 60, 0.45);
+    animation: spin 14s linear infinite;
+  }
+  @keyframes ringpulse {
+    0%, 100% { transform: scale(1);   opacity: 0.9; }
+    50%      { transform: scale(1.06); opacity: 0.5; }
+  }
+  .reticle .tick {
+    position: absolute;
+    background: var(--amber);
+    box-shadow: 0 0 6px var(--amber-glow);
+  }
+  .reticle .tick.t1 { left: 50%; top: -6px;  width: 1px; height: 8px; transform: translateX(-50%); }
+  .reticle .tick.t2 { left: 50%; bottom: -6px; width: 1px; height: 8px; transform: translateX(-50%); }
+  .reticle .tick.t3 { top: 50%; left: -6px; width: 8px; height: 1px; transform: translateY(-50%); }
+  .reticle .tick.t4 { top: 50%; right: -6px; width: 8px; height: 1px; transform: translateY(-50%); }
+
+  /* ---------- HUD panels ---------- */
+  .hud {
+    position: absolute;
+    z-index: 6;
+    background: var(--glass);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid var(--line-hi);
+    color: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease-out);
+  }
+  .frame.tracking .hud { opacity: 1; }
+
+  /* Distance panel — top left */
+  .hud-distance {
+    top: 18px; left: 18px;
+    padding: 14px 16px 12px;
+    min-width: 220px;
+    transform: translate(-12px, 0);
+  }
+  .frame.tracking .hud-distance { transform: translate(0, 0); }
+
+  .hud-label {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .hud-label .right {
+    color: var(--amber);
+    letter-spacing: 0.14em;
+  }
+  .hud-distance .value {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .hud-distance .value .unit {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 13px;
+    color: var(--ink-2);
+    letter-spacing: 0.1em;
+    margin-left: 2px;
+  }
+  .hud-distance .sub {
+    margin-top: 8px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 10px; letter-spacing: 0.18em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  /* Sonar pulse visualization */
+  .sonar {
+    position: relative;
+    width: 100%; height: 36px;
+    margin-top: 10px;
+    border: 1px solid var(--line);
+    background:
+      linear-gradient(90deg, rgba(245,177,60,0.08), transparent 60%),
+      repeating-linear-gradient(90deg, rgba(244,237,224,0.06) 0 1px, transparent 1px 22px);
+    overflow: hidden;
+  }
+  .sonar::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 2px;
+    background: var(--amber);
+    box-shadow: 0 0 10px var(--amber-glow);
+    animation: sonar 2.6s linear infinite;
+  }
+  @keyframes sonar {
+    0% { transform: translateX(0); opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: translateX(220px); opacity: 0; }
+  }
+  .sonar .blip {
+    position: absolute;
+    top: 50%; left: 70%;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 0 var(--amber-glow);
+    animation: blip 2.6s ease-out infinite;
+  }
+  @keyframes blip {
+    0%, 60% { box-shadow: 0 0 0 0 rgba(245, 177, 60, 0.55); }
+    100%    { box-shadow: 0 0 0 14px rgba(245, 177, 60, 0); }
+  }
+
+  /* Bird info card — bottom left */
+  .hud-bird {
+    bottom: 18px; left: 18px;
+    padding: 16px 18px 14px;
+    min-width: 280px;
+    max-width: 60%;
+    transform: translate(-12px, 12px);
+  }
+  .frame.tracking .hud-bird { transform: translate(0, 0); }
+
+  .hud-bird .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  .hud-bird .head .common {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  .hud-bird .head .latin {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-top: 3px;
+    letter-spacing: 0.005em;
+  }
+  .hud-bird .head .conf {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .hud-bird .head .conf small {
+    display: block;
+    color: var(--ink-3);
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    margin-bottom: 2px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 18px;
+  }
+  .grid .cell {
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .cell .k {
+    font-size: 9.5px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .cell .v {
+    font-family: var(--display);
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: 0.005em;
+    font-weight: 500;
+  }
+  .cell .v em {
+    font-style: italic;
+    color: var(--ink-2);
+    font-weight: 400;
+  }
+
+  .behaviour {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .behaviour .tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--bg-deep);
+    background: var(--amber);
+    padding: 4px 8px 3px;
+    border-radius: 2px;
+    flex: none;
+    margin-top: 1px;
+  }
+  .behaviour .desc {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+
+  /* Top-right meta panel: timestamp / REC */
+  .hud-meta {
+    top: 18px; right: 18px;
+    padding: 10px 12px;
+    text-align: right;
+    transform: translate(12px, 0);
+  }
+  .frame.tracking .hud-meta { transform: translate(0, 0); }
+  .hud-meta .row {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    font-size: 10px; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .hud-meta .row + .row { margin-top: 5px; }
+  .hud-meta .rec-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--crit);
+    box-shadow: 0 0 8px rgba(255, 106, 77, 0.7);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+  .hud-meta .num {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    letter-spacing: 0.14em;
+  }
+
+  /* Connector line from reticle down to info card */
+  .connector {
+    position: absolute;
+    z-index: 5;
+    left: calc(var(--bird-cx) - 65px);
+    top: calc(var(--bird-cy) + 28px);
+    width: 1px;
+    height: 0;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    opacity: 0;
+    transition: height 0.6s var(--ease) 0.1s, opacity 0.4s var(--ease);
+  }
+  .frame.tracking .connector {
+    height: 28%;
+    opacity: 0.75;
+  }
+
+  /* ---------- footer ---------- */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .footer .hint {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .footer .arrow {
+    color: var(--amber);
+    animation: nudge 2.2s ease-in-out infinite;
+  }
+  @keyframes nudge {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(4px); }
+  }
+  .footer .right {
+    display: flex; align-items: center; gap: 22px;
+  }
+  .footer kbd {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 6px;
+    border: 1px solid var(--line-hi);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    color: var(--ink);
+    background: var(--bg-rise);
+    letter-spacing: 0.05em;
+  }
+  .footer .gallery-pos {
+    color: var(--amber);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.16em;
+  }
+  .footer .gallery-pos #galleryIdx { color: var(--ink); }
+
+  /* tighter layout on smaller screens */
+  @media (max-width: 720px) {
+    .page { padding: 12px 14px; gap: 10px; }
+    .hud-distance { min-width: 0; padding: 10px 12px 9px; }
+    .hud-distance .value { font-size: 32px; }
+    .sonar { display: none; }
+    .hud-bird { min-width: 0; max-width: calc(100% - 28px); padding: 12px 14px; left: 14px; bottom: 14px; }
+    .hud-bird .head .common { font-size: 18px; }
+    .hud-bird .head .latin { font-size: 11px; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+    .cell .v { font-size: 12px; }
+    .behaviour .desc { font-size: 12px; }
+    .behaviour .tag { font-size: 9px; padding: 3px 7px 2px; }
+    .hud-meta { display: none; }
+    .hud-distance .hud-label > span:first-child::after { content: ""; }
+    .hud-distance { right: 14px; }
+    .hud-distance { top: 14px; left: 14px; }
+    .hud-distance .value { font-size: 28px; }
+
+    .topbar { font-size: 10px; gap: 10px; }
+    .brand-text strong { font-size: 13px; line-height: 1.1; }
+    .brand-text span { display: none; }
+    .top-meta { gap: 12px; }
+    .top-meta .pill:not(:first-child):not(#clock) { display: none; }
+    .top-meta .pill#clock { font-size: 10px; }
+
+    .footer { font-size: 10px; gap: 8px; }
+    .footer .right { display: none; }
+
+    .reticle { width: 86px; height: 86px; }
+    .standby { font-size: 9px; padding: 6px 11px; bottom: 10px; letter-spacing: 0.28em; }
+    .corners { inset: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ============ HEADER ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-text">
+        <strong>Field Unit / Optic 04</strong>
+        <span>Subject 0427 · Tracking Demo</span>
+      </div>
+    </div>
+    <div class="top-meta">
+      <div class="pill"><span class="dot"></span><span>Live · Local</span></div>
+      <div class="pill">Lat <span class="num">45.4642° N</span></div>
+      <div class="pill">Lon <span class="num">9.1900° E</span></div>
+      <div class="pill" id="clock">— : — : —</div>
+    </div>
+  </header>
+
+  <!-- ============ STAGE ============ -->
+  <main class="stage">
+    <div class="frame is-video" id="frame">
+
+      <!-- bottom video — gets the colour inversion on hover -->
+      <video class="layer layer-invert layer-video" id="vBg"
+             muted playsinline autoplay loop preload="auto" disablepictureinpicture>
+        <source src="bird.mp4" type="video/mp4">
+        <source src="bird.webm" type="video/webm">
+      </video>
+
+      <!-- top video — same source, masked to bird silhouette so the bird stays normal -->
+      <video class="layer layer-bird layer-video" id="vBird"
+             muted playsinline autoplay loop preload="auto" disablepictureinpicture aria-hidden="true">
+        <source src="bird.mp4" type="video/mp4">
+        <source src="bird.webm" type="video/webm">
+      </video>
+
+      <!-- still-image layers (used when stepping into the gallery via arrow keys) -->
+      <img class="layer layer-invert layer-image" id="iBg" alt="" draggable="false">
+      <img class="layer layer-bird layer-image" id="iBird" alt="" aria-hidden="true" draggable="false">
+
+      <!-- visible segmentation outline (matches the mask path above) -->
+      <svg class="seg-outline" viewBox="0 0 824 1028" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M514 272 Q508 250 528 245 Q540 240 552 241 L553 224 Q562 214 575 216 Q588 220 588 236 Q587 250 591 253 Q616 256 638 268 Q660 279 672 293 Q678 298 666 304 Q638 313 608 317 Q590 320 582 321 L586 344 L572 345 L569 322 Q553 322 540 320 Q522 314 514 302 Q506 285 514 272 Z"/>
+      </svg>
+
+      <!-- scanline veneer over the inverted area -->
+      <div class="scanlines" aria-hidden="true"></div>
+
+      <!-- frame brackets -->
+      <div class="corners" aria-hidden="true"><i></i><i></i></div>
+
+      <!-- standby hint (replaced by HUD on hover) -->
+      <div class="standby">Hover the subject to engage</div>
+
+      <!-- reticle around the bird -->
+      <div class="reticle" aria-hidden="true">
+        <div class="ring"></div>
+        <div class="ring r2"></div>
+        <div class="tick t1"></div>
+        <div class="tick t2"></div>
+        <div class="tick t3"></div>
+        <div class="tick t4"></div>
+      </div>
+
+      <!-- thin connector line from subject to info card -->
+      <div class="connector" aria-hidden="true"></div>
+
+      <!-- DISTANCE HUD (top left) -->
+      <aside class="hud hud-distance" aria-label="Distance to subject">
+        <div class="hud-label">
+          <span>Distance to subject</span>
+          <span class="right"> Vision</span>
+        </div>
+        <div class="value">
+          <span id="distVal">12.4</span><span class="unit">m</span>
+        </div>
+        <div class="sub">
+          <span id="distErr">± 0.18 m</span>
+          <span>·</span>
+          <span id="distBearing">Bearing 287°</span>
+        </div>
+        <div class="sonar" aria-hidden="true">
+          <div class="blip"></div>
+        </div>
+      </aside>
+
+      <!-- META HUD (top right) -->
+      <aside class="hud hud-meta" aria-label="Capture metadata">
+        <div class="row"><span class="rec-dot"></span><span>REC · 4K · 30 fps</span></div>
+        <div class="row"><span>ƒ/2.8 · 1/240 · ISO 400</span></div>
+        <div class="row"><span>Frame</span><span class="num" id="frameNum">000</span></div>
+      </aside>
+
+      <!-- BIRD INFO CARD (bottom left) -->
+      <aside class="hud hud-bird" aria-label="Subject information">
+        <div class="head">
+          <div>
+            <div class="common" id="birdCommon">Black-headed Gull</div>
+            <div class="latin" id="birdLatin">Chroicocephalus ridibundus</div>
+          </div>
+          <div class="conf">
+            <small>Match</small>
+            <span id="birdMatch">97.4</span> %
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="cell">
+            <div class="k">Age</div>
+            <div class="v" id="birdAge">Adult <em>· 3–5 yr</em></div>
+          </div>
+          <div class="cell">
+            <div class="k">Sex</div>
+            <div class="v" id="birdSex">Male <em>· likely</em></div>
+          </div>
+          <div class="cell">
+            <div class="k">Plumage</div>
+            <div class="v" id="birdPlumage">Breeding</div>
+          </div>
+          <div class="cell">
+            <div class="k">Status</div>
+            <div class="v" id="birdStatus">Least concern</div>
+          </div>
+        </div>
+
+        <div class="behaviour">
+          <span class="tag">Behaviour</span>
+          <div class="desc" id="birdBehaviour">Preening — at rest on a vegetated mid‑channel islet, alert but undisturbed.</div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="hint">
+      <span class="arrow">→</span>
+      <span>Move cursor onto the subject to engage segmentation</span>
+    </div>
+    <div class="right">
+      <span><kbd>←</kbd> <kbd>→</kbd> Gallery</span>
+      <span>·</span>
+      <span><kbd>F</kbd> Focus</span>
+      <span><kbd>L</kbd> Lock</span>
+      <span>·</span>
+      <span class="gallery-pos"><span id="galleryIdx">1</span> / <span id="galleryTot">1</span></span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // ------------------------------------------------------------------
+  // Gallery views
+  //   View 0 = the original video (Black-headed Gull preening).
+  //   Views 1..5 = still images dropped into /assets, each with its own
+  //   segmentation mask path (in the image's pixel space), reticle anchor,
+  //   hover hot-zone, distance readout, and bird info card.
+  // ------------------------------------------------------------------
+  const views = [
+    {
+      type: 'video',
+      ar: [824, 1028],
+      viewBox: '0 0 824 1028',
+      mask: 'M514 272 Q508 250 528 245 Q540 240 552 241 L553 224 Q562 214 575 216 Q588 220 588 236 Q587 250 591 253 Q616 256 638 268 Q660 279 672 293 Q678 298 666 304 Q638 313 608 317 Q590 320 582 321 L586 344 L572 345 L569 322 Q553 322 540 320 Q522 314 514 302 Q506 285 514 272 Z',
+      reticle: { cx: '71.6%', cy: '27.5%' },
+      zone: { x1: 0.55, y1: 0.21, x2: 0.86, y2: 0.37 },
+      distance: 12.4, distError: '± 0.18 m', bearing: 'Bearing 287°',
+      info: {
+        common: 'Black-headed Gull',
+        latin:  'Chroicocephalus ridibundus',
+        match:  '97.4',
+        age:    ['Adult', '· 3–5 yr'],
+        sex:    ['Male', '· likely'],
+        plumage:'Breeding',
+        status: 'Least concern',
+        behaviour: 'Preening — at rest on a vegetated mid‑channel islet, alert but undisturbed.'
+      },
+      frameId: null  // dynamic counter for the video
+    },
+    {
+      type: 'image',
+      src: 'assets/bird-1.jpeg',
+      ar: [1080, 1349],
+      viewBox: '0 0 1080 1349',
+      // Three gulls in flight — top, mid-channel, bottom (compound path)
+      mask: 'M 130 290 Q 110 240 160 175 Q 210 140 260 150 Q 285 200 295 240 Q 340 280 360 320 Q 320 365 270 380 Q 210 380 170 360 Q 130 330 130 290 Z M 290 760 Q 290 730 340 720 Q 400 715 460 735 Q 485 755 480 775 Q 440 800 380 800 Q 325 800 300 790 Q 290 780 290 760 Z M 180 1180 Q 200 1090 270 1010 Q 320 970 360 990 Q 380 1040 400 1100 Q 430 1170 480 1220 Q 520 1245 540 1240 Q 470 1250 380 1240 Q 290 1240 220 1230 Q 185 1215 180 1180 Z',
+      reticle: { cx: '32%', cy: '20%' },
+      zone: { x1: 0.06, y1: 0.04, x2: 0.55, y2: 0.95 },
+      distance: 8.7, distError: '± 0.42 m', bearing: 'Bearing 194°',
+      info: {
+        common: 'Black-headed Gulls',
+        latin:  'Chroicocephalus ridibundus',
+        match:  '94.1',
+        age:    ['Adults', '· 3 individuals'],
+        sex:    ['Mixed', '· flock'],
+        plumage:'Non-breeding',
+        status: 'Least concern',
+        behaviour: 'Skim-foraging — synchronised low-pass beneath a graffitied culvert, scanning the water surface for prey.'
+      },
+      frameId: 'STL · 4827'
+    },
+    {
+      type: 'image',
+      src: 'assets/bird-2.png',
+      ar: [900, 900],
+      viewBox: '0 0 900 900',
+      // Peregrine falcon perched, body upright, head at top
+      mask: 'M 395 215 Q 378 200 410 192 Q 440 192 458 215 Q 472 250 470 295 Q 470 340 462 380 Q 455 420 438 440 Q 410 452 388 438 Q 370 410 368 370 Q 367 320 372 280 Q 378 240 388 220 Q 392 215 395 215 Z',
+      reticle: { cx: '47%', cy: '36%' },
+      zone: { x1: 0.32, y1: 0.18, x2: 0.62, y2: 0.62 },
+      distance: 24.6, distError: '± 0.31 m', bearing: 'Bearing 052°',
+      info: {
+        common: 'Peregrine Falcon',
+        latin:  'Falco peregrinus',
+        match:  '98.8',
+        age:    ['Adult', '· >2 yr'],
+        sex:    ['Female', '· likely'],
+        plumage:'Definitive',
+        status: 'Least concern',
+        behaviour: 'Plucking — perched on a low branch over avian prey, post-stoop feeding bout.'
+      },
+      frameId: 'STL · 1102'
+    },
+    {
+      type: 'image',
+      src: 'assets/bird-3.png',
+      ar: [900, 900],
+      viewBox: '0 0 900 900',
+      // White-tailed eagle mantling — wings raised over a carcass
+      mask: 'M 320 270 Q 305 200 345 145 Q 395 110 440 130 L 445 95 Q 475 70 510 80 Q 540 105 530 145 Q 565 130 605 145 Q 640 165 635 215 Q 620 260 580 270 L 545 280 Q 555 320 540 360 Q 525 400 500 415 Q 470 422 445 405 Q 425 370 422 320 Q 415 290 400 280 Q 360 290 330 285 Q 320 280 320 270 Z',
+      reticle: { cx: '52%', cy: '28%' },
+      zone: { x1: 0.32, y1: 0.08, x2: 0.74, y2: 0.52 },
+      distance: 31.2, distError: '± 0.55 m', bearing: 'Bearing 341°',
+      info: {
+        common: 'White-tailed Eagle',
+        latin:  'Haliaeetus albicilla',
+        match:  '95.7',
+        age:    ['Adult', '· >5 yr'],
+        sex:    ['Unknown', '· monomorphic'],
+        plumage:'Definitive',
+        status: 'Least concern',
+        behaviour: 'Mantling — wings shielding a fresh ungulate carcass; vigilant against scavenger competitors.'
+      },
+      frameId: 'STL · 0319'
+    },
+    {
+      type: 'image',
+      src: 'assets/bird-4.png',
+      ar: [900, 900],
+      viewBox: '0 0 900 900',
+      // Two terns mid-air — top tern wings up, bottom tern stooping
+      mask: 'M 270 250 Q 245 195 285 155 Q 325 130 360 155 Q 385 195 395 235 L 425 220 Q 475 205 510 235 Q 500 280 450 295 L 410 310 Q 385 345 350 360 Q 315 365 285 345 Q 268 310 270 250 Z M 320 470 Q 305 420 360 395 Q 410 380 445 405 L 480 390 Q 540 380 590 410 Q 610 455 590 495 Q 545 525 495 520 L 470 545 Q 440 580 400 580 Q 360 575 335 540 Q 318 510 320 470 Z',
+      reticle: { cx: '50%', cy: '46%' },
+      zone: { x1: 0.18, y1: 0.10, x2: 0.82, y2: 0.78 },
+      distance: 16.9, distError: '± 0.27 m', bearing: 'Bearing 102°',
+      info: {
+        common: 'Sandwich Terns',
+        latin:  'Thalasseus sandvicensis',
+        match:  '93.2',
+        age:    ['Adults', '· pair'],
+        sex:    ['Pair', '· ♂ / ♀'],
+        plumage:'Breeding',
+        status: 'Least concern',
+        behaviour: 'Aerial courtship — vertical fish-pass display between paired adults during mate-bonding.'
+      },
+      frameId: 'STL · 2055'
+    },
+    {
+      type: 'image',
+      src: 'assets/image%205977.png',
+      ar: [900, 899],
+      viewBox: '0 0 900 899',
+      // Two barn swallows in mid-air confrontation — left bird with trailing tail, right bird upper-right
+      mask: 'M 220 380 Q 180 320 200 270 Q 240 240 290 250 L 280 200 Q 310 170 350 185 Q 380 220 370 270 Q 410 280 420 320 Q 405 350 365 360 L 340 380 Q 310 420 280 470 Q 250 540 220 640 Q 195 720 175 760 Q 165 720 175 640 Q 195 530 230 460 Q 220 420 220 380 Z M 420 280 Q 410 230 450 195 Q 490 175 540 185 L 535 130 Q 560 110 600 120 Q 625 150 615 195 Q 660 200 690 230 Q 700 270 680 305 Q 645 325 605 320 Q 600 360 580 405 Q 550 440 510 450 Q 470 445 445 415 Q 420 380 425 340 Q 415 310 420 280 Z',
+      reticle: { cx: '52%', cy: '40%' },
+      zone: { x1: 0.10, y1: 0.10, x2: 0.85, y2: 0.85 },
+      distance: 4.8, distError: '± 0.09 m', bearing: 'Bearing 218°',
+      info: {
+        common: 'Barn Swallows',
+        latin:  'Hirundo rustica',
+        match:  '96.5',
+        age:    ['Adults', '· pair'],
+        sex:    ['Pair', '· ♂ / ♀'],
+        plumage:'Breeding',
+        status: 'Least concern',
+        behaviour: 'Mid-air confrontation — agonistic encounter, likely territorial display near a nesting site.'
+      },
+      frameId: 'STL · 5977'
+    }
+  ];
+
+  // -------- DOM refs --------
+  const frame  = document.getElementById('frame');
+  const vBg    = document.getElementById('vBg');
+  const vBird  = document.getElementById('vBird');
+  const iBg    = document.getElementById('iBg');
+  const iBird  = document.getElementById('iBird');
+  const segOutline = document.querySelector('.seg-outline');
+  const segPath    = segOutline.querySelector('path');
+
+  const distVal = document.getElementById('distVal');
+  const distErr = document.getElementById('distErr');
+  const distBearing = document.getElementById('distBearing');
+  const birdCommon  = document.getElementById('birdCommon');
+  const birdLatin   = document.getElementById('birdLatin');
+  const birdMatch   = document.getElementById('birdMatch');
+  const birdAge     = document.getElementById('birdAge');
+  const birdSex     = document.getElementById('birdSex');
+  const birdPlumage = document.getElementById('birdPlumage');
+  const birdStatus  = document.getElementById('birdStatus');
+  const birdBehaviour = document.getElementById('birdBehaviour');
+  const galleryIdx  = document.getElementById('galleryIdx');
+  const galleryTot  = document.getElementById('galleryTot');
+  const frameNumEl  = document.getElementById('frameNum');
+
+  galleryTot.textContent = views.length;
+
+  // -------- video sync --------
+  function tryPlay(v){ const p = v.play(); if (p) p.catch(()=>{}); }
+  [vBg, vBird].forEach(v => {
+    v.addEventListener('loadedmetadata', () => tryPlay(v));
+    v.addEventListener('canplay',        () => tryPlay(v));
+  });
+  function syncLoop(){
+    if (!vBg.paused && !vBird.paused) {
+      const drift = Math.abs(vBg.currentTime - vBird.currentTime);
+      if (drift > 0.06) vBird.currentTime = vBg.currentTime;
+    }
+    requestAnimationFrame(syncLoop);
+  }
+  requestAnimationFrame(syncLoop);
+  vBg.addEventListener('pause', () => vBird.pause());
+  vBg.addEventListener('play',  () => tryPlay(vBird));
+
+  // -------- view application --------
+  let activeZone = views[0].zone;
+  let activeView = views[0];
+  let currentIdx = 0;
+
+  function maskUrl(viewBox, path){
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${viewBox}' preserveAspectRatio='none'><path fill='white' d='${path}'/></svg>`;
+    return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+  }
+
+  function applyView(idx){
+    const v = views[idx];
+    activeView = v;
+    activeZone = v.zone;
+    currentIdx = idx;
+
+    // reset hover/track state on switch
+    frame.classList.remove('tracking');
+
+    // aspect ratio + reticle anchor as CSS variables
+    frame.style.setProperty('--ar-w', v.ar[0]);
+    frame.style.setProperty('--ar-h', v.ar[1]);
+    frame.style.setProperty('--bird-cx', v.reticle.cx);
+    frame.style.setProperty('--bird-cy', v.reticle.cy);
+
+    // mask on the bird layer (both video & image, only one is visible)
+    const url = maskUrl(v.viewBox, v.mask);
+    [vBird, iBird].forEach(el => {
+      el.style.webkitMaskImage = url;
+      el.style.maskImage = url;
+    });
+
+    // visible amber outline
+    segOutline.setAttribute('viewBox', v.viewBox);
+    segPath.setAttribute('d', v.mask);
+
+    // toggle which layer pair is showing
+    if (v.type === 'video') {
+      frame.classList.add('is-video');
+      frame.classList.remove('is-image');
+      tryPlay(vBg); tryPlay(vBird);
+    } else {
+      frame.classList.add('is-image');
+      frame.classList.remove('is-video');
+      vBg.pause(); vBird.pause();
+      iBg.src   = v.src;
+      iBird.src = v.src;
+    }
+
+    // HUD info
+    distVal.textContent = v.distance.toFixed(1);
+    distErr.textContent = v.distError;
+    distBearing.textContent = v.bearing;
+
+    birdCommon.textContent = v.info.common;
+    birdLatin.textContent  = v.info.latin;
+    birdMatch.textContent  = v.info.match;
+    birdAge.innerHTML      = `${v.info.age[0]} <em>${v.info.age[1]}</em>`;
+    birdSex.innerHTML      = `${v.info.sex[0]} <em>${v.info.sex[1]}</em>`;
+    birdPlumage.textContent= v.info.plumage;
+    birdStatus.textContent = v.info.status;
+    birdBehaviour.textContent = v.info.behaviour;
+
+    // frame counter: dynamic for video, static label for stills
+    if (v.frameId) frameNumEl.textContent = v.frameId;
+
+    // gallery position
+    galleryIdx.textContent = idx + 1;
+  }
+
+  // -------- pointer / touch handling --------
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  function setTracking(on){ frame.classList.toggle('tracking', on); }
+
+  function inZone(clientX, clientY){
+    const r = frame.getBoundingClientRect();
+    const x = (clientX - r.left) / r.width;
+    const y = (clientY - r.top)  / r.height;
+    const z = activeZone;
+    return { inside: x >= z.x1 && x <= z.x2 && y >= z.y1 && y <= z.y2, x, y };
+  }
+
+  function modulateDistance(x, y){
+    const z = activeZone;
+    const cxn = (z.x1 + z.x2) / 2;
+    const cyn = (z.y1 + z.y2) / 2;
+    const d = Math.hypot(x - cxn, y - cyn);
+    distVal.textContent = (activeView.distance + (d * 6 - 0.4)).toFixed(1);
+  }
+
+  if (isTouch) {
+    let toggled = false;
+    frame.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      const z = inZone(t.clientX, t.clientY);
+      if (z.inside) {
+        toggled = !toggled;
+        setTracking(toggled);
+        if (toggled) modulateDistance(z.x, z.y);
+      } else if (toggled) {
+        toggled = false;
+        setTracking(false);
+      }
+    }, { passive: true });
+
+    const sb = document.querySelector('.standby');
+    if (sb) sb.textContent = 'Tap the subject to engage';
+    const hint = document.querySelector('.footer .hint span:last-child');
+    if (hint) hint.textContent = 'Tap the subject to engage segmentation';
+  } else {
+    frame.addEventListener('mousemove', (e) => {
+      const z = inZone(e.clientX, e.clientY);
+      setTracking(z.inside);
+      if (z.inside) modulateDistance(z.x, z.y);
+    });
+    frame.addEventListener('mouseleave', () => setTracking(false));
+  }
+
+  // -------- live readouts: clock & frame counter --------
+  const clockEl = document.getElementById('clock');
+  function tick(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    clockEl.textContent =
+      pad(d.getHours()) + ' : ' + pad(d.getMinutes()) + ' : ' + pad(d.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  function frameTick(){
+    if (activeView.type === 'video' && !vBg.paused && vBg.duration) {
+      const f = Math.floor(vBg.currentTime * 30) % 1000;
+      frameNumEl.textContent = String(f).padStart(3, '0');
+    }
+    requestAnimationFrame(frameTick);
+  }
+  requestAnimationFrame(frameTick);
+
+  // -------- keyboard: F/L holdovers, ←/→ for gallery --------
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const dir = e.key === 'ArrowRight' ? 1 : -1;
+      const next = (currentIdx + dir + views.length) % views.length;
+      applyView(next);
+      e.preventDefault();
+      return;
+    }
+    if (e.key.toLowerCase() === 'f') setTracking(true);
+    if (e.key.toLowerCase() === 'l') frame.classList.toggle('tracking');
+  });
+
+  // -------- init --------
+  applyView(0);
+</script>
+
+</body>
+</html>
