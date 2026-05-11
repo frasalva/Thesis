@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neck Symbiont</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body.cursor-mode { cursor: none; }
+  body.cursor-mode .mode-toggle { cursor: pointer; }
+
+  canvas {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .ui {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .header {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 28px;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    color: #fff;
+  }
+
+  .header .center { text-align: center; flex: 1; }
+  .header .right  { text-align: right; }
+
+  .panel {
+    position: absolute;
+    top: 78px;
+    left: 28px;
+    width: 480px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background: #000;
+    display: grid;
+    grid-template-columns: 170px 1fr;
+  }
+
+  .panel .cell {
+    padding: 22px 22px;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: #fff;
+    line-height: 1.6;
+  }
+
+  .panel .label {
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 24px;
+  }
+
+  .panel .body {
+    border-left: 1px solid rgba(255, 255, 255, 0.9);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .panel .body p + p { margin-top: 10px; }
+  .panel .body em {
+    font-style: normal;
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+  .panel .body .accent-blue { color: #58A8FF; }
+  .panel .body .accent-red  { color: #E8001C; }
+
+  .mode-toggle {
+    position: absolute;
+    top: 60px;
+    right: 28px;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 9px 14px 9px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background 0.15s ease;
+  }
+  .mode-toggle:hover { background: rgba(255, 255, 255, 0.08); }
+
+  .mode-toggle .indicator {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #E8001C;
+    box-shadow: 0 0 8px rgba(232, 0, 28, 0.6);
+  }
+  .mode-toggle.cursor .indicator {
+    background: #58A8FF;
+    box-shadow: 0 0 8px rgba(88, 168, 255, 0.6);
+  }
+
+  .footer-hint {
+    position: absolute;
+    bottom: 24px;
+    right: 28px;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .paused-indicator {
+    position: absolute;
+    bottom: 24px;
+    left: 28px;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .paused-indicator.visible { opacity: 1; }
+</style>
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <div class="ui">
+    <div class="header">
+      <div class="left">Neck Symbiont</div>
+      <div class="center">Perceive your impact</div>
+      <div class="right">v0.1 — field study</div>
+    </div>
+
+    <div class="panel">
+      <div class="cell label">Ecosystem</div>
+      <div class="cell body">
+        <p>A roaming agent drifts across a mesh of environmental sensors,
+        weaving live links to the nodes within range.</p>
+        <p>When the agent rests, it emits a <em class="accent-blue">call</em>.
+        Sensors that hear the call <em class="accent-blue">resonate in blue</em>,
+        marking the moving edge of its perception.</p>
+        <p>Switch to <em>cursor mode</em> to walk the field yourself — <em>click</em> to call.</p>
+      </div>
+    </div>
+
+    <button class="mode-toggle" id="modeToggle" aria-pressed="false">
+      <span class="indicator"></span>
+      <span class="label" id="modeLabel">Auto</span>
+    </button>
+
+    <div class="paused-indicator" id="pausedIndicator">Paused</div>
+    <div class="footer-hint">Space — pause &nbsp;·&nbsp; M — toggle mode &nbsp;·&nbsp; Click — call (cursor)</div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const CONFIG = {
+    minDotDistance: 120,
+    dotPadding: 60,
+    dotRadius: 1.8,
+    dotRadiusActiveNear: 5.0,
+    dotRadiusBlue: 4.0,
+    connectionRadius: 200,
+    birdSize: 10,
+    birdSpeed: 1.25,
+    maxTurnRate: 0.03,
+    edgeMargin: 90,
+    edgeSteerStrength: 0.025,
+    lineOpacityNear: 0.9,
+    lineOpacityFar: 0.08,
+    dotOpacity: 0.32,
+    dotOpacityActive: 1.0,
+    lineWidth: 1,
+    birdColor: '#E8001C',
+    birdStroke: '#FFFFFF',
+    birdStrokeWidth: 1.25,
+
+    // Stop-and-go cadence
+    moveDurMin: 2600,
+    moveDurMax: 5200,
+    pauseDurMin: 1600,
+    pauseDurMax: 3400,
+    pauseEaseInMs: 350,
+    pauseEaseOutMs: 450,
+
+    // Calls (waves)
+    callIntervalMs: 700,
+    waveSpeed: 1.6,
+    waveMaxRadius: 220,
+    waveColor: '88, 168, 255', // rgb tuple
+    blueDurationMs: 2400,
+
+    // Cursor mode
+    cursorFollow: 0.18,
+    cursorIdleMs: 250,
+  };
+
+  const MODE = { AUTO: 'auto', CURSOR: 'cursor' };
+  const STATE = { MOVING: 'moving', PAUSED: 'paused' };
+
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d');
+  const pausedIndicator = document.getElementById('pausedIndicator');
+  const modeBtn = document.getElementById('modeToggle');
+  const modeLabel = document.getElementById('modeLabel');
+
+  let width = 0, height = 0, dpr = 1;
+  let dots = [];
+  let waves = [];
+  let paused = false;
+  let mode = MODE.AUTO;
+  let lastFrame = performance.now();
+
+  const bird = {
+    x: 0, y: 0,
+    heading: 0,
+    state: STATE.MOVING,
+    stateUntil: 0,
+    speedFactor: 1,
+    lastCallAt: 0,
+  };
+
+  const cursor = {
+    x: -1000, y: -1000,
+    lastMoveAt: 0,
+    seen: false,
+  };
+
+  function resize() {
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    buildDotField();
+
+    if (
+      bird.x < 0 || bird.x > width ||
+      bird.y < 0 || bird.y > height ||
+      (bird.x === 0 && bird.y === 0)
+    ) {
+      bird.x = width * 0.5;
+      bird.y = height * 0.5;
+      bird.heading = Math.random() * Math.PI * 2;
+    }
+  }
+
+  function buildDotField() {
+    dots = [];
+    const minDist = CONFIG.minDotDistance;
+    const minDist2 = minDist * minDist;
+    const pad = CONFIG.dotPadding;
+    const w = Math.max(0, width  - pad * 2);
+    const h = Math.max(0, height - pad * 2);
+    const target = Math.max(20, Math.floor((w * h) / (minDist * minDist * 1.25)));
+    const maxAttempts = target * 40;
+    let attempts = 0;
+    while (dots.length < target && attempts < maxAttempts) {
+      attempts++;
+      const x = pad + Math.random() * w;
+      const y = pad + Math.random() * h;
+      let ok = true;
+      for (let k = 0; k < dots.length; k++) {
+        const d = dots[k];
+        const dx = d.x - x, dy = d.y - y;
+        if (dx * dx + dy * dy < minDist2) { ok = false; break; }
+      }
+      if (ok) dots.push({ x, y, blueUntil: 0 });
+    }
+  }
+
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  function scheduleNextStateChange(now) {
+    if (bird.state === STATE.MOVING) {
+      bird.stateUntil = now + rand(CONFIG.moveDurMin, CONFIG.moveDurMax);
+    } else {
+      bird.stateUntil = now + rand(CONFIG.pauseDurMin, CONFIG.pauseDurMax);
+    }
+  }
+
+  function easeInOut(t) {
+    t = Math.max(0, Math.min(1, t));
+    return t * t * (3 - 2 * t);
+  }
+
+  function updateAuto(now) {
+    if (now > bird.stateUntil) {
+      bird.state = bird.state === STATE.MOVING ? STATE.PAUSED : STATE.MOVING;
+      scheduleNextStateChange(now);
+    }
+
+    let target = bird.state === STATE.MOVING ? 1 : 0;
+    let easeMs = bird.state === STATE.MOVING ? CONFIG.pauseEaseOutMs : CONFIG.pauseEaseInMs;
+    let step = 1 / Math.max(1, easeMs / 16.67);
+    bird.speedFactor += Math.sign(target - bird.speedFactor) * Math.min(step, Math.abs(target - bird.speedFactor));
+
+    if (bird.speedFactor > 0.01) {
+      bird.heading += (Math.random() - 0.5) * 2 * CONFIG.maxTurnRate * bird.speedFactor;
+
+      const m = CONFIG.edgeMargin;
+      let steerX = 0, steerY = 0;
+      if (bird.x < m)            steerX += (m - bird.x) / m;
+      if (bird.x > width - m)    steerX -= (bird.x - (width - m)) / m;
+      if (bird.y < m)            steerY += (m - bird.y) / m;
+      if (bird.y > height - m)   steerY -= (bird.y - (height - m)) / m;
+
+      if (steerX !== 0 || steerY !== 0) {
+        const desired = Math.atan2(steerY, steerX);
+        let diff = desired - bird.heading;
+        while (diff >  Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        bird.heading += diff * CONFIG.edgeSteerStrength;
+      }
+
+      const speed = CONFIG.birdSpeed * bird.speedFactor;
+      bird.x += Math.cos(bird.heading) * speed;
+      bird.y += Math.sin(bird.heading) * speed;
+
+      if (bird.x < -20)         bird.x = width + 20;
+      if (bird.x > width + 20)  bird.x = -20;
+      if (bird.y < -20)         bird.y = height + 20;
+      if (bird.y > height + 20) bird.y = -20;
+    }
+
+    if (bird.state === STATE.PAUSED && bird.speedFactor < 0.15) {
+      maybeEmitCall(now);
+    }
+  }
+
+  function updateCursor(now) {
+    if (!cursor.seen) return;
+
+    const dx = cursor.x - bird.x;
+    const dy = cursor.y - bird.y;
+    const dist = Math.hypot(dx, dy);
+
+    bird.x += dx * CONFIG.cursorFollow;
+    bird.y += dy * CONFIG.cursorFollow;
+
+    if (dist > 1.5) {
+      const desired = Math.atan2(dy, dx);
+      let diff = desired - bird.heading;
+      while (diff >  Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      bird.heading += diff * 0.25;
+    }
+
+    const idle = (now - cursor.lastMoveAt) > CONFIG.cursorIdleMs;
+    bird.state = idle ? STATE.PAUSED : STATE.MOVING;
+  }
+
+  function emitCall(now) {
+    waves.push({
+      x: bird.x,
+      y: bird.y,
+      radius: 6,
+      prevRadius: 0,
+    });
+    bird.lastCallAt = now;
+  }
+
+  function maybeEmitCall(now) {
+    if (now - bird.lastCallAt < CONFIG.callIntervalMs) return;
+    waves.push({
+      x: bird.x,
+      y: bird.y,
+      radius: 6,
+      prevRadius: 0,
+    });
+    bird.lastCallAt = now;
+  }
+
+  function updateWaves(now) {
+    for (let i = waves.length - 1; i >= 0; i--) {
+      const w = waves[i];
+      w.prevRadius = w.radius;
+      w.radius += CONFIG.waveSpeed;
+
+      for (let k = 0; k < dots.length; k++) {
+        const d = dots[k];
+        const dd = Math.hypot(d.x - w.x, d.y - w.y);
+        if (dd > w.prevRadius && dd <= w.radius) {
+          d.blueUntil = now + CONFIG.blueDurationMs;
+        }
+      }
+
+      if (w.radius >= CONFIG.waveMaxRadius) waves.splice(i, 1);
+    }
+  }
+
+  function draw(now) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+
+    const R = CONFIG.connectionRadius;
+    const r2 = R * R;
+
+    // Waves
+    for (let i = 0; i < waves.length; i++) {
+      const w = waves[i];
+      const t = w.radius / CONFIG.waveMaxRadius;
+      const alpha = (1 - t) * 0.55;
+      ctx.strokeStyle = `rgba(${CONFIG.waveColor},${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(w.x, w.y, w.radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Connection lines (per-line opacity scaled by proximity)
+    ctx.lineWidth = CONFIG.lineWidth;
+    for (let k = 0; k < dots.length; k++) {
+      const d = dots[k];
+      const dx = d.x - bird.x, dy = d.y - bird.y;
+      const dist2 = dx * dx + dy * dy;
+      if (dist2 >= r2) continue;
+      const dist = Math.sqrt(dist2);
+      const s = 1 - dist / R;
+      const e = s * s * (3 - 2 * s);
+      const op = CONFIG.lineOpacityFar + (CONFIG.lineOpacityNear - CONFIG.lineOpacityFar) * e;
+      ctx.strokeStyle = `rgba(255,255,255,${op})`;
+      ctx.beginPath();
+      ctx.moveTo(bird.x, bird.y);
+      ctx.lineTo(d.x, d.y);
+      ctx.stroke();
+    }
+
+    // Dots: outside-radius default, inside-radius scaled, blue overrides
+    for (let k = 0; k < dots.length; k++) {
+      const d = dots[k];
+      if (d.blueUntil > now) continue;
+      const dx = d.x - bird.x, dy = d.y - bird.y;
+      const dist2 = dx * dx + dy * dy;
+      let radius, opacity;
+      if (dist2 < r2) {
+        const s = 1 - Math.sqrt(dist2) / R;
+        const e = s * s * (3 - 2 * s);
+        radius  = CONFIG.dotRadius   + (CONFIG.dotRadiusActiveNear - CONFIG.dotRadius)   * e;
+        opacity = CONFIG.dotOpacity  + (CONFIG.dotOpacityActive    - CONFIG.dotOpacity)  * e;
+      } else {
+        radius  = CONFIG.dotRadius;
+        opacity = CONFIG.dotOpacity;
+      }
+      ctx.fillStyle = `rgba(255,255,255,${opacity})`;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Blue dots (override)
+    for (let k = 0; k < dots.length; k++) {
+      const d = dots[k];
+      if (d.blueUntil <= now) continue;
+      const remaining = (d.blueUntil - now) / CONFIG.blueDurationMs;
+      const a = 0.5 + 0.5 * remaining;
+      ctx.fillStyle = `rgba(${CONFIG.waveColor},${a})`;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, CONFIG.dotRadiusBlue, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    drawBird();
+  }
+
+  function drawBird() {
+    const s = CONFIG.birdSize;
+    ctx.save();
+    ctx.translate(bird.x, bird.y);
+    ctx.rotate(bird.heading);
+    ctx.beginPath();
+    ctx.moveTo(s, 0);
+    ctx.lineTo(-s * 0.78, s * 0.85);
+    ctx.lineTo(-s * 0.78, -s * 0.85);
+    ctx.closePath();
+    ctx.fillStyle = CONFIG.birdColor;
+    ctx.fill();
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = CONFIG.birdStrokeWidth;
+    ctx.strokeStyle = CONFIG.birdStroke;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function frame() {
+    const now = performance.now();
+    if (!paused) {
+      if (mode === MODE.AUTO) updateAuto(now);
+      else                    updateCursor(now);
+      updateWaves(now);
+      draw(now);
+    }
+    lastFrame = now;
+    requestAnimationFrame(frame);
+  }
+
+  function setMode(next) {
+    mode = next;
+    document.body.classList.toggle('cursor-mode', mode === MODE.CURSOR);
+    modeBtn.classList.toggle('cursor', mode === MODE.CURSOR);
+    modeBtn.setAttribute('aria-pressed', mode === MODE.CURSOR ? 'true' : 'false');
+    modeLabel.textContent = mode === MODE.CURSOR ? 'Cursor' : 'Auto';
+
+    const now = performance.now();
+    if (mode === MODE.AUTO) {
+      bird.state = STATE.MOVING;
+      bird.speedFactor = 1;
+      scheduleNextStateChange(now);
+    } else {
+      bird.state = STATE.PAUSED;
+      bird.speedFactor = 0;
+      cursor.lastMoveAt = now;
+    }
+  }
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      paused = !paused;
+      pausedIndicator.classList.toggle('visible', paused);
+    } else if (e.code === 'KeyM') {
+      setMode(mode === MODE.AUTO ? MODE.CURSOR : MODE.AUTO);
+    }
+  });
+  modeBtn.addEventListener('click', () => {
+    setMode(mode === MODE.AUTO ? MODE.CURSOR : MODE.AUTO);
+  });
+  window.addEventListener('mousemove', (e) => {
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    cursor.lastMoveAt = performance.now();
+    cursor.seen = true;
+  });
+  window.addEventListener('mousedown', (e) => {
+    if (mode !== MODE.CURSOR || paused) return;
+    if (e.target.closest('.mode-toggle')) return;
+    emitCall(performance.now());
+  });
+
+  resize();
+  scheduleNextStateChange(performance.now());
+  draw(performance.now());
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

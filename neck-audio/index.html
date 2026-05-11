@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neck Symbiont — Perceive your impact</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <span class="left">Neck Symbiont</span>
+        <span class="center">Perceive your impact</span>
+        <span class="right">Lorem …</span>
+      </header>
+
+      <canvas id="radial-canvas"></canvas>
+
+      <section class="ministrip">
+        <div class="label">Real Time Noise</div>
+        <canvas id="linear-canvas"></canvas>
+      </section>
+
+      <section class="controls">
+        <button class="btn" id="btn-play" type="button">
+          <svg class="icon" viewBox="0 0 12 12" aria-hidden="true">
+            <polygon points="2,1 11,6 2,11" fill="currentColor"></polygon>
+          </svg>
+          <span class="label">Play Audio</span>
+        </button>
+        <button class="btn" id="btn-mic" type="button">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="6" y="1.5" width="4" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M3.5 7.5 a4.5 4.5 0 0 0 9 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="8" y1="12" x2="8" y2="14.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span class="label">Allow mic</span>
+        </button>
+      </section>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
