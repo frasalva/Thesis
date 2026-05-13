@@ -285,12 +285,16 @@ for (const tab of document.querySelectorAll('.mobile-tab')) {
   });
 }
 
-// Auto-load the first library sample into the left panel so a first-time
-// visitor sees something without having to click. The right panel stays
-// empty until the user chooses + compare.
-if (SAMPLE_LIBRARY.length > 0) {
-  const first = SAMPLE_LIBRARY[0];
-  loadPanel('left', { name: first.label, url: first.url });
+// Auto-load the first two library samples into panels A and B so a
+// first-time visitor sees a comparison immediately. Loading into the right
+// panel also triggers setSingleMode(false), so desktop starts in split mode.
+if (SAMPLE_LIBRARY[0]) {
+  const a = SAMPLE_LIBRARY[0];
+  loadPanel('left', { name: a.label, url: a.url });
+}
+if (SAMPLE_LIBRARY[1]) {
+  const b = SAMPLE_LIBRARY[1];
+  loadPanel('right', { name: b.label, url: b.url });
 }
 
 requestAnimationFrame(tick);

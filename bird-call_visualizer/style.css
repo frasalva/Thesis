@@ -283,12 +283,19 @@ html, body {
   /* Keyboard hint is irrelevant without a keyboard. */
   #hint { display: none; }
 
-  /* Bigger touch target for play / pause. */
+  /* Bigger touch target for play / pause, with much higher contrast — the
+     desktop styling (gray on near-black) is invisible on a phone screen. */
   #btn-play {
-    width: 44px;
+    width: 52px;
     height: 36px;
-    font-size: 16px;
+    font-size: 18px;
     touch-action: manipulation;
+    background: #1a1a1a;
+    border-color: #666;
+    color: #fff;
+  }
+  #btn-play:disabled {
+    opacity: 0.4;  /* override the desktop 0.25 so it's still findable */
   }
 
   /* Header row needs to grow if its content wraps, so let it size to content. */

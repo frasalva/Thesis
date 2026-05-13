@@ -92,6 +92,19 @@ render correctly on an actual handset. Two causes:
   outside a media query needs to be re-checked inside any media query
   that changes `grid-template-rows`.
 
+### Pre-load both panels + visible play button on mobile
+- Auto-load extended: panel A gets `SAMPLE_LIBRARY[0]`, panel B gets
+  `SAMPLE_LIBRARY[1]`. Loading into the right panel triggers
+  `setSingleMode(false)` as a side effect, so desktop now boots straight
+  into the side-by-side compare view (which is the point of the project).
+- Play button styling on mobile was effectively invisible — desktop's
+  `color: #777` on `#060606` with a `#2a2a2a` border looks tasteful on a
+  laptop but disappears in bright outdoor lighting. Inside the mobile media
+  query the button gets a `#1a1a1a` background, `#666` border, and white
+  text, plus the disabled-state opacity is bumped from 0.25 to 0.4 so it
+  stays findable even before audio finishes loading. Sizing also nudged
+  from 44 to 52 px wide.
+
 ### Reminder for future changes
 - The audio analysis pipeline (`src/audio.js`) does FFT in JS on the main
   thread. On phones, the auto-load of sample 1 will run that pipeline on
