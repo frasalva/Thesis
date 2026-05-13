@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Neck Symbiont — Perceive your impact</title>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -11,7 +14,7 @@
       <header class="topbar">
         <span class="left">Neck Symbiont</span>
         <span class="center">Perceive your impact</span>
-        <span class="right">Lorem …</span>
+        <span class="right">Sound as presence</span>
       </header>
 
       <canvas id="radial-canvas"></canvas>
@@ -37,6 +40,12 @@
           <span class="label">Allow mic</span>
         </button>
       </section>
+
+      <!-- Mobile-only: shown if the browser blocks the AudioContext from
+           auto-resuming. One tap unlocks it. Hidden on desktop via CSS. -->
+      <div id="start-veil" hidden>
+        <button id="start-veil-btn" type="button">Tap to begin</button>
+      </div>
     </div>
 
     <script type="module" src="src/main.js"></script>

@@ -150,3 +150,105 @@ html, body {
   border-color: rgba(255, 255, 255, 0.95);
   color: #fff;
 }
+
+/* ── Start veil (mobile only) ────────────────────────────────────────────── */
+/* Hidden on desktop entirely. On mobile it surfaces only if autoplay was
+   blocked by the browser; one tap unlocks the AudioContext. */
+
+#start-veil {
+  display: none;
+}
+
+#start-veil-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  padding: 12px 24px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#start-veil-btn:hover { border-color: #fff; }
+
+/* ── Mobile layout (≤ 640px) ─────────────────────────────────────────────── */
+/* Restructure the absolute desktop layout into a vertical stack:
+     topbar / radial (flex) / linear strip (smaller).
+   Also hide the mic button — only the bundled demo audio is exposed here.   */
+
+@media (max-width: 640px) {
+  .app {
+    /* 100dvh tracks the visible viewport (URL bar / home indicator). */
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    overscroll-behavior: none;
+  }
+
+  .topbar {
+    position: static;
+    padding: 10px 14px;
+    font-size: 11px;
+    grid-row: 1;
+  }
+  /* Center label is implied by left+right on a narrow screen — drop it. */
+  .topbar .center { display: none; }
+
+  /* Radial canvas becomes a normal grid item filling the middle row. */
+  #radial-canvas {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    grid-row: 2;
+  }
+
+  /* Linear strip: smaller than the radial, sitting below it. */
+  .ministrip {
+    position: static;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    padding: 6px 14px 10px;
+    border-top: 1px solid var(--border);
+    pointer-events: auto;
+    grid-row: 3;
+  }
+  .ministrip .label { font-size: 11px; margin-bottom: 4px; }
+  #linear-canvas { height: 90px; }
+
+  /* Mic button is removed on mobile per the project spec. */
+  #btn-mic { display: none; }
+
+  /* Play button stays available for manual pause/resume. Position it over
+     the radial section, above the linear strip. */
+  .controls {
+    bottom: auto;
+    top: calc(env(safe-area-inset-top) + 44px);
+    left: 14px;
+  }
+  .btn .label {
+    height: 32px;        /* bigger touch target */
+    padding: 0 16px;
+    font-size: 13px;
+  }
+
+  /* Veil is allowed to render on mobile — JS sets [hidden] when autoplay
+     succeeds and removes it when the user has tapped. */
+  #start-veil {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  #start-veil[hidden] { display: none; }
+}

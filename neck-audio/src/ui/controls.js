@@ -59,4 +59,5 @@ export function initControls(engine, { onSourceChange } = {}) {
   });
 
   refresh();
+  return { refresh };
 }

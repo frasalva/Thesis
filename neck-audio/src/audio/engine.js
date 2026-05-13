@@ -1,7 +1,7 @@
 // AudioContext lifecycle + source switching. Exposes the AnalyserNode that the
 // rest of the app pulls features from. Source can be either the demo signal or
-// a microphone stream (Phase 6 hook is wired but mic.start() is left for the
-// "Allow mic" button to call when needed).
+// a microphone stream (the mic UI is hidden on mobile, but the engine method
+// stays available for desktop).
 
 import { createDemoSource } from './demo.js';
 import { createAnalyser } from './analyser.js';

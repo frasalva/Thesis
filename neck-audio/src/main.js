@@ -24,22 +24,61 @@ const state = {
 const radialCanvas = document.getElementById('radial-canvas');
 const linearCanvas = document.getElementById('linear-canvas');
 
-initControls(engine);
+const ui = initControls(engine);
 
-// Test/dev hooks (URL params, harmless in normal use):
-//   ?autoplay=1  -> simulate a click on Play after load (best-effort).
-//   ?fake=1      -> bypass the AudioContext entirely and inject synthetic
-//                   features into the render loop. Used for headless render
-//                   verification, where Web Audio is not reliable.
-const params = new URLSearchParams(location.search);
-if (params.get('autoplay') === '1') {
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const btn = document.getElementById('btn-play');
-      if (btn) btn.click();
-    }, 50);
+// ── Mobile-only: auto-start the demo audio ───────────────────────────────
+// Desktop keeps the original behavior (user clicks Play / Allow mic). On
+// mobile we try to resume the AudioContext immediately; if the browser's
+// autoplay policy blocks it, a small "Tap to begin" veil takes the gesture.
+
+const isMobile = window.matchMedia('(max-width: 640px)').matches;
+
+if (isMobile) {
+  const veil = document.getElementById('start-veil');
+  const veilBtn = document.getElementById('start-veil-btn');
+
+  async function tryAutoStart() {
+    try {
+      await engine.startDemo();
+    } catch (err) {
+      console.warn('startDemo threw:', err);
+    }
+    // resume() can silently fail without throwing under autoplay policies —
+    // the authoritative signal is the context state.
+    const running = engine.isRunning();
+    if (running) {
+      ui.refresh();
+      veil.hidden = true;
+    }
+    return running;
+  }
+
+  window.addEventListener('load', async () => {
+    const ok = await tryAutoStart();
+    if (!ok) veil.hidden = false;
+  });
+
+  veilBtn.addEventListener('click', async () => {
+    veil.hidden = true;
+    await tryAutoStart();
+  });
+
+  // First interaction anywhere else also counts as the unlock gesture.
+  ['pointerdown', 'touchstart', 'keydown'].forEach((evt) => {
+    window.addEventListener(evt, async function once() {
+      window.removeEventListener(evt, once);
+      if (!engine.isRunning()) {
+        await tryAutoStart();
+        if (engine.isRunning()) veil.hidden = true;
+      }
+    });
   });
 }
+
+// Test/dev hook: ?fake=1 bypasses the AudioContext entirely and injects
+// synthetic features into the render loop. Used for headless render
+// verification, where Web Audio is not reliable.
+const params = new URLSearchParams(location.search);
 if (params.get('fake') === '1') {
   state.fake = true;
 }
