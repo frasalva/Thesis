@@ -179,6 +179,10 @@
       inset 0 0 60px rgba(0,0,0,0.45);
     cursor: crosshair;
     isolation: isolate;
+    /* Horizontal gestures on the frame are owned by the swipe-nav handler;
+       vertical ones still pass through to the browser (no scroll anyway,
+       but the declaration keeps gesture intent unambiguous on mobile). */
+    touch-action: pan-y;
   }
 
   /* The image / video layers */
@@ -1117,9 +1121,52 @@
   }
 
   if (isTouch) {
+    // Touch input: one gesture handler that disambiguates between a tap
+    // (toggle tracking on the subject) and a horizontal swipe (navigate
+    // through the gallery — the desktop ←/→ shortcut, gestured).
     let toggled = false;
+    let startX = 0, startY = 0, startT = 0, moved = false;
+    const SWIPE_PX        = 40;   // min horizontal travel to count as a swipe
+    const SWIPE_MAX_MS    = 600;  // anything slower is treated as a drag
+    const SWIPE_DOMINANCE = 1.2;  // horizontal must exceed vertical by this ratio
+    const MOVE_TOL_PX     = 8;    // travel above this means it's no longer a tap
+
     frame.addEventListener('touchstart', (e) => {
       const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      startT = e.timeStamp;
+      moved  = false;
+    }, { passive: true });
+
+    frame.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (Math.hypot(t.clientX - startX, t.clientY - startY) > MOVE_TOL_PX) {
+        moved = true;
+      }
+    }, { passive: true });
+
+    frame.addEventListener('touchend', (e) => {
+      const t  = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      const dt = e.timeStamp - startT;
+      const absDx = Math.abs(dx), absDy = Math.abs(dy);
+
+      // Horizontal swipe -> change view. Swipe-left advances, swipe-right
+      // goes back (mirrors the spatial intuition of a card stack).
+      if (dt < SWIPE_MAX_MS && absDx > SWIPE_PX && absDx > absDy * SWIPE_DOMINANCE) {
+        const dir = dx < 0 ? 1 : -1;
+        const next = (currentIdx + dir + views.length) % views.length;
+        // applyView() clears the `tracking` class; mirror it locally so the
+        // next tap re-engages from a known state.
+        toggled = false;
+        applyView(next);
+        return;
+      }
+
+      // Tap — only count it if the finger barely moved.
+      if (moved) return;
       const z = inZone(t.clientX, t.clientY);
       if (z.inside) {
         toggled = !toggled;
@@ -1132,9 +1179,9 @@
     }, { passive: true });
 
     const sb = document.querySelector('.standby');
-    if (sb) sb.textContent = 'Tap the subject to engage';
+    if (sb) sb.textContent = 'Tap subject · swipe ← → gallery';
     const hint = document.querySelector('.footer .hint span:last-child');
-    if (hint) hint.textContent = 'Tap the subject to engage segmentation';
+    if (hint) hint.textContent = 'Tap to engage · swipe ← → for gallery';
   } else {
     frame.addEventListener('mousemove', (e) => {
       const z = inZone(e.clientX, e.clientY);
