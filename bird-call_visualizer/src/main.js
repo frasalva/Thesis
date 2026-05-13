@@ -271,6 +271,20 @@ document.getElementById('btn-compare').addEventListener('click', () => {
   setSingleMode(false);
 });
 
+// Mobile tabs (hidden on desktop via CSS). Toggling .show-b on #app swaps
+// which panel is rendered; the freshly visible panel needs its renderer
+// resized because its container went from display:none → display:grid.
+for (const tab of document.querySelectorAll('.mobile-tab')) {
+  tab.addEventListener('click', () => {
+    const side = tab.dataset.panel; // 'left' or 'right'
+    appEl.classList.toggle('show-b', side === 'right');
+    for (const t of document.querySelectorAll('.mobile-tab')) {
+      t.classList.toggle('active', t === tab);
+    }
+    requestAnimationFrame(() => panels[side].renderer.resize());
+  });
+}
+
 // Auto-load the first library sample into the left panel so a first-time
 // visitor sees something without having to click. The right panel stays
 // empty until the user chooses + compare.

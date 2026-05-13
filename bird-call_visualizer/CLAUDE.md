@@ -82,6 +82,13 @@ V1 mapping:
 Stored in `assets/audio/` with descriptive lowercase names following the
 pattern `species_source_id.ext` (e.g. `blackbird_xeno_12345.wav`).
 
+## Memory
+
+A running log of non-obvious changes, decisions, and gotchas lives in
+`memory.md` at the project root. Read it before making structural changes
+so you don't re-litigate already-decided trade-offs. Append new dated
+entries at the top as the project evolves.
+
 ## Reference material
 
 All reference material is in `reference/`:

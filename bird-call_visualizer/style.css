@@ -219,6 +219,87 @@ html, body {
   flex-shrink: 0;
 }
 
+/* ── Mobile tabs (hidden on desktop) ──────────────────────────────────────── */
+
+#mobile-tabs {
+  display: none;          /* shown only via the mobile @media block below */
+}
+
+.mobile-tab {
+  flex: 1;
+  cursor: pointer;
+  background: #000;
+  border: none;
+  border-right: 1px solid #111;
+  color: #444;
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0;
+  touch-action: manipulation;   /* kill iOS double-tap-to-zoom delay */
+}
+.mobile-tab:last-child { border-right: none; }
+.mobile-tab.active     { color: #ddd; background: #0a0a0a; }
+
+/* ── Mobile layout (≤ 700px) ──────────────────────────────────────────────── */
+/* One panel at a time, swapped via the tab bar at the top. */
+
+@media (max-width: 700px) {
+  #app,
+  #app.single-mode {
+    grid-template-columns: 1fr;
+    grid-template-rows: 36px minmax(0, 1fr) 44px;
+  }
+
+  #mobile-tabs {
+    display: flex;
+    grid-row: 1;
+    grid-column: 1;
+    border-bottom: 1px solid #111;
+  }
+
+  .divider { display: none; }
+
+  /* Both panels share the same grid cell; show-b on #app picks which one
+     is visible. Default (no .show-b) shows panel A. */
+  .panel {
+    grid-row: 2;
+    grid-column: 1;
+  }
+  #app             #panel-left  { display: grid; }
+  #app             #panel-right { display: none; }
+  #app.show-b      #panel-left  { display: none; }
+  #app.show-b      #panel-right { display: grid; }
+
+  /* Compare button is meaningless when both panels are always one tap away. */
+  .compare-btn { display: none !important; }
+
+  /* Keyboard hint is irrelevant without a keyboard. */
+  #hint { display: none; }
+
+  /* Bigger touch target for play / pause. */
+  #btn-play {
+    width: 44px;
+    height: 36px;
+    font-size: 16px;
+    touch-action: manipulation;
+  }
+
+  /* Header row needs to grow if its content wraps, so let it size to content. */
+  .panel {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .panel-header {
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    height: auto;
+    min-height: 34px;
+  }
+  /* Species name is redundant on mobile — the tab bar already shows A / B. */
+  .panel-name { display: none; }
+}
+
 /* ── Per-point floating labels (CSS2DRenderer) ────────────────────────────── */
 
 .point-label {

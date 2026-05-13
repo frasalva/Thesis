@@ -16,6 +16,13 @@
 <body>
   <div id="app" class="single-mode">
 
+    <!-- Only visible on narrow viewports (see @media in style.css). Lets the
+         user switch between the two species panels one-at-a-time on phones. -->
+    <div id="mobile-tabs">
+      <button class="mobile-tab active" data-panel="left">A</button>
+      <button class="mobile-tab"        data-panel="right">B</button>
+    </div>
+
     <div class="panel" id="panel-left">
       <div class="panel-header">
         <span class="panel-name">Species A</span>
