@@ -74,6 +74,24 @@ at the top so the most recent state is easy to find.
   the freshly visible panel went from `display: none` to `display: grid`
   and its `ResizeObserver` may not catch up before the first render.
 
+### Mobile follow-up — two bugs caught on a real phone
+The first mobile commit looked fine in DevTools device emulation but didn't
+render correctly on an actual handset. Two causes:
+
+- **Missing viewport meta tag.** Without
+  `<meta name="viewport" content="width=device-width, initial-scale=1">`
+  mobile browsers render the page at a virtual ~980 px wide layout and scale
+  the result down, so `@media (max-width: 700px)` never matched on real
+  devices — only DevTools emulation, which injects the meta implicitly.
+  Always add this meta to any new HTML entry point.
+- **`#transport` grid-row collision.** Desktop CSS pins `#transport` to
+  `grid-row: 2`, which is also the panel row in the new 3-row mobile grid
+  (`36px / 1fr / 44px`). Result: the transport bar painted on top of the
+  panel. Fix: explicit `#transport { grid-row: 3 }` inside the mobile
+  media query. Lesson: any element with an explicit `grid-row` set
+  outside a media query needs to be re-checked inside any media query
+  that changes `grid-template-rows`.
+
 ### Reminder for future changes
 - The audio analysis pipeline (`src/audio.js`) does FFT in JS on the main
   thread. On phones, the auto-load of sample 1 will run that pipeline on

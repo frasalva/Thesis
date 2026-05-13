@@ -267,6 +267,11 @@ html, body {
     grid-row: 2;
     grid-column: 1;
   }
+  /* Transport's desktop rule pins it to row 2 — on mobile that's the panel
+     row, so push it to row 3 explicitly. */
+  #transport {
+    grid-row: 3;
+  }
   #app             #panel-left  { display: grid; }
   #app             #panel-right { display: none; }
   #app.show-b      #panel-left  { display: none; }
