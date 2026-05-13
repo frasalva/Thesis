@@ -105,6 +105,34 @@ render correctly on an actual handset. Two causes:
   stays findable even before audio finishes loading. Sizing also nudged
   from 44 to 52 px wide.
 
+### iOS viewport units + safe-area-insets
+- Symptom: transport bar (and the now-visible play button) clipped off the
+  bottom of the screen on a real iPhone, even though the layout worked in
+  laptop Chrome at the same width.
+- Cause 1 (URL bar): `100vh` on iOS Safari measures the viewport as if the
+  URL bar were always hidden, but the URL bar overlaps content when it's
+  shown — so `#app { height: 100vh }` ran 50–80 px taller than the visible
+  viewport and the bottom row got pushed off-screen.
+- Cause 2 (home indicator): iPhones without a Home button overlay a thin
+  bar at the very bottom of the screen. Content sitting in the bottom
+  ~34 px would be drawn under it.
+- Fix in `style.css`:
+  - `#app { height: 100vh; height: 100dvh; }` — `dvh` tracks the actual
+    visible viewport and shrinks when the URL bar appears. Keeping `vh`
+    above it as a fallback for older browsers.
+  - In the mobile `@media` block, the grid rows switched from fixed
+    `36px / 1fr / 44px` to `auto / 1fr / auto` so the tabs and transport
+    rows can grow to include safe-area padding.
+  - `#mobile-tabs` gets `padding-top: env(safe-area-inset-top)`
+    (notch / dynamic island).
+  - `#transport` gets `padding-bottom: env(safe-area-inset-bottom)`
+    (home indicator).
+  - Both use `box-sizing: content-box` so the 36 / 44 px height counts
+    only the content, with safe-area padding *added on top*.
+- Pre-condition: `<meta name="viewport" content="… viewport-fit=cover">`
+  must be set or `env(safe-area-inset-*)` returns 0 on iOS. We already
+  added that earlier in the day.
+
 ### Reminder for future changes
 - The audio analysis pipeline (`src/audio.js`) does FFT in JS on the main
   thread. On phones, the auto-load of sample 1 will run that pipeline on

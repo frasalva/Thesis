@@ -23,7 +23,12 @@ html, body {
      wider than 50%, breaking the equal split. */
   grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   grid-template-rows: 1fr 44px;
+  /* 100vh on iOS Safari counts URL-bar / bottom-toolbar area as part of the
+     viewport, which pushes the transport bar off-screen. 100dvh tracks the
+     *visible* viewport and shrinks when the toolbar is shown. The 100vh
+     fallback covers older browsers that don't support dvh. */
   height: 100vh;
+  height: 100dvh;
   background: #000;
 }
 
@@ -249,7 +254,10 @@ html, body {
   #app,
   #app.single-mode {
     grid-template-columns: 1fr;
-    grid-template-rows: 36px minmax(0, 1fr) 44px;
+    /* auto rows for tabs/transport so they can grow to include safe-area
+       padding (notch at top, home indicator at bottom). The middle row
+       takes everything else. */
+    grid-template-rows: auto minmax(0, 1fr) auto;
   }
 
   #mobile-tabs {
@@ -257,6 +265,9 @@ html, body {
     grid-row: 1;
     grid-column: 1;
     border-bottom: 1px solid #111;
+    height: 36px;
+    padding-top: env(safe-area-inset-top);
+    box-sizing: content-box;   /* keep the 36px tab area below the notch */
   }
 
   .divider { display: none; }
@@ -268,9 +279,13 @@ html, body {
     grid-column: 1;
   }
   /* Transport's desktop rule pins it to row 2 — on mobile that's the panel
-     row, so push it to row 3 explicitly. */
+     row, so push it to row 3 explicitly. Padding-bottom keeps the play
+     button clear of the iPhone home indicator. */
   #transport {
     grid-row: 3;
+    height: 44px;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: content-box;
   }
   #app             #panel-left  { display: grid; }
   #app             #panel-right { display: none; }
