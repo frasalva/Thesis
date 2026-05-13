@@ -186,11 +186,25 @@ export class Renderer {
     this.#scene.add(new THREE.LineSegments(this.#linesGeo, linesMat));
 
     // --- Resize ---
-    this.#resizeObserver = new ResizeObserver(() => this.#onResize());
+    // Use the entry's contentRect rather than re-reading clientWidth — it's
+    // the size the browser actually laid out for this frame, and avoids
+    // edge cases where clientWidth lags behind the observed resize.
+    this.#resizeObserver = new ResizeObserver((entries) => {
+      const cr = entries[0].contentRect;
+      this.#resizeTo(cr.width, cr.height);
+    });
     this.#resizeObserver.observe(container);
 
     // --- Render loop ---
     this.#loop();
+  }
+
+  // Public: force a resize based on the container's current size.
+  // Useful when the layout changes via a class toggle (e.g. single → split
+  // mode) — ResizeObserver normally catches this, but calling explicitly
+  // guarantees the buffer and camera aspect are in sync on the next frame.
+  resize() {
+    this.#resizeTo(this.#container.clientWidth, this.#container.clientHeight);
   }
 
   // -------------------------------------------------------------------------
@@ -398,10 +412,8 @@ export class Renderer {
     this.#labels.add(p, v);
   }
 
-  #onResize() {
-    const w = this.#container.clientWidth;
-    const h = this.#container.clientHeight;
-    if (w === 0 || h === 0) return;
+  #resizeTo(w, h) {
+    if (w <= 0 || h <= 0) return;
     this.#camera.aspect = w / h;
     this.#camera.updateProjectionMatrix();
     this.#glRenderer.setSize(w, h);

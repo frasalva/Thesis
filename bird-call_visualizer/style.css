@@ -17,7 +17,11 @@ html, body {
 
 #app {
   display: grid;
-  grid-template-columns: 1fr 1px 1fr;
+  /* minmax(0, 1fr) lets the columns shrink past their content's min-content
+     width — without this, the panel header (with its native <select>, whose
+     intrinsic width depends on the widest option text) can force the columns
+     wider than 50%, breaking the equal split. */
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   grid-template-rows: 1fr 44px;
   height: 100vh;
   background: #000;
@@ -25,7 +29,7 @@ html, body {
 
 /* Single-panel mode: only #panel-left is visible, full width. */
 #app.single-mode {
-  grid-template-columns: 1fr 0 0;
+  grid-template-columns: minmax(0, 1fr) 0 0;
 }
 #app.single-mode .divider,
 #app.single-mode #panel-right {
@@ -38,6 +42,10 @@ html, body {
   display: grid;
   grid-template-rows: 34px 1fr;
   overflow: hidden;
+  /* Grid items default to min-width: auto, which prevents them from shrinking
+     below their content's intrinsic width. Force 0 so the outer 1fr/1fr grid
+     can actually split evenly regardless of header content width. */
+  min-width: 0;
   grid-row: 1;
   background: #000;
 }
@@ -86,6 +94,32 @@ html, body {
 .file-btn:hover,
 .compare-btn:hover { color: #999; border-color: #444; }
 .file-btn input[type="file"] { display: none; }
+
+/* Library dropdown — styled to match the .file-btn aesthetic. */
+.library-select {
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555;
+  padding: 2px 7px;
+  border: 1px solid #2a2a2a;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: #000;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+.library-select:hover { color: #999; border-color: #444; }
+.library-select option {
+  background: #0a0a0a;
+  color: #999;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
 /* Compare button is only meaningful when we're not already in split mode. */
 #app:not(.single-mode) .compare-btn { display: none; }

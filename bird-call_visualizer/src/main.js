@@ -1,5 +1,6 @@
-import { Renderer }     from './renderer.js';
-import { analyzeAudio } from './audio.js';
+import { Renderer }       from './renderer.js';
+import { analyzeAudio }   from './audio.js';
+import { SAMPLE_LIBRARY } from './config.js';
 
 // ── Panel state ────────────────────────────────────────────────────────────
 
@@ -42,6 +43,14 @@ const appEl = document.getElementById('app');
 
 function setSingleMode(single) {
   appEl.classList.toggle('single-mode', single);
+  // Layout changes immediately when the class flips, but we wait one
+  // animation frame so the browser has resolved the new sizes before we
+  // ask the renderers for their container dimensions. ResizeObserver should
+  // also catch this, but calling explicitly removes any timing ambiguity.
+  requestAnimationFrame(() => {
+    panels.left.renderer.resize();
+    panels.right.renderer.resize();
+  });
 }
 
 // ── Audio playback ─────────────────────────────────────────────────────────
@@ -118,12 +127,28 @@ function togglePlay() {
 }
 
 // ── File loading ───────────────────────────────────────────────────────────
+// Accepts either a File (user upload) or a { name, url } object (bundled
+// library sample). Both end up as an ArrayBuffer fed into analyzeAudio.
 
-async function loadPanel(side, file) {
-  setFileName(side, file.name, 'loading');
+async function loadPanel(side, source) {
+  setFileName(side, source.name, 'loading');
   pause();
 
-  const arrayBuf = await file.arrayBuffer();
+  let arrayBuf;
+  try {
+    if (source instanceof File) {
+      arrayBuf = await source.arrayBuffer();
+    } else {
+      const res = await fetch(source.url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${source.url}`);
+      arrayBuf = await res.arrayBuffer();
+    }
+  } catch (err) {
+    console.error(`[main] failed to load "${source.name}":`, err);
+    setFileName(side, `${source.name} — not found`, '');
+    return;
+  }
+
   const { points, audioBuffer } = await analyzeAudio(arrayBuf);
 
   panels[side].points      = points;
@@ -140,12 +165,12 @@ async function loadPanel(side, file) {
     if (panels[s].points) panels[s].renderer.loadPoints(panels[s].points);
   }
 
-  setFileName(side, file.name, 'loaded');
+  setFileName(side, source.name, 'loaded');
   document.getElementById('btn-play').disabled = false;
   updateProgress();
 
   console.log(
-    `[main] "${file.name}" → ${points.length} points, ` +
+    `[main] "${source.name}" → ${points.length} points, ` +
     `${audioBuffer.duration.toFixed(2)} s`,
   );
 }
@@ -220,10 +245,38 @@ document.getElementById('file-right').addEventListener('change', (e) => {
   if (e.target.files[0]) loadPanel('right', e.target.files[0]);
 });
 
+// Populate each library dropdown from SAMPLE_LIBRARY (defined in config.js).
+// The first option is the placeholder ("library ▾"); samples follow.
+for (const side of ['left', 'right']) {
+  const sel = document.getElementById(`library-${side}`);
+  SAMPLE_LIBRARY.forEach((item, i) => {
+    const opt = document.createElement('option');
+    opt.value       = String(i);
+    opt.textContent = item.label;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', (e) => {
+    const i = e.target.value;
+    if (i === '') return;
+    const item = SAMPLE_LIBRARY[Number(i)];
+    loadPanel(side, { name: item.label, url: item.url });
+    // Reset so the same option can be re-picked later.
+    e.target.value = '';
+  });
+}
+
 document.getElementById('btn-play').addEventListener('click', togglePlay);
 
 document.getElementById('btn-compare').addEventListener('click', () => {
   setSingleMode(false);
 });
+
+// Auto-load the first library sample into the left panel so a first-time
+// visitor sees something without having to click. The right panel stays
+// empty until the user chooses + compare.
+if (SAMPLE_LIBRARY.length > 0) {
+  const first = SAMPLE_LIBRARY[0];
+  loadPanel('left', { name: first.label, url: first.url });
+}
 
 requestAnimationFrame(tick);

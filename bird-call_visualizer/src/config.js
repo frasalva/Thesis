@@ -64,3 +64,12 @@ export const CONFIG = {
     emissionTime:[0, 1],     // not used as axis in v1; placeholder
   },
 };
+
+// Bundled audio samples. Shown in the per-panel library dropdown so a
+// first-time visitor can pick one without needing a local file.
+// Add entries here when new files land in assets/audio/.
+export const SAMPLE_LIBRARY = [
+  { label: 'sample 1 — bruit',         url: 'assets/audio/sample1_bruit.mp3' },
+  { label: 'sample 2',                 url: 'assets/audio/sample2.mp3' },
+  { label: 'sample 3 — mourning dove', url: 'assets/audio/sample3_mourningDove.mp3' },
+];
