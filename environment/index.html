@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+/>
 <title>Neck Symbiont</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,6 +162,43 @@
     transition: opacity 0.2s ease;
   }
   .paused-indicator.visible { opacity: 1; }
+
+  /* ── Mobile (≤ 640px) ────────────────────────────────────────────────
+     - Panel/header shrink to fit the viewport.
+     - Mode toggle, footer hint, and the "cursor mode" line are removed:
+       on mobile we only run Auto mode (no cursor / click-to-call).         */
+  @media (max-width: 640px) {
+    .header {
+      top: max(12px, env(safe-area-inset-top));
+      padding: 0 14px;
+      font-size: 11px;
+    }
+    /* Two-line top bar gets crowded on phones — drop the center tagline. */
+    .header .center { display: none; }
+    .header .right  { font-size: 10.5px; opacity: 0.75; }
+
+    .panel {
+      top: max(48px, calc(env(safe-area-inset-top) + 36px));
+      left: 14px;
+      right: 14px;
+      width: auto;                   /* fill available width */
+      grid-template-columns: 92px 1fr;
+    }
+    .panel .cell      { padding: 12px 12px; font-size: 11px; line-height: 1.5; }
+    .panel .label     { padding-top: 14px; font-size: 11.5px; letter-spacing: 0.14em; }
+    .panel .body      { font-size: 11px; }
+    .panel .body p + p { margin-top: 7px; }
+    .desktop-only      { display: none; }
+
+    /* Cursor mode is unreachable on mobile. */
+    .mode-toggle       { display: none; }
+    .footer-hint       { display: none; }
+
+    .paused-indicator {
+      left: 14px;
+      bottom: max(14px, env(safe-area-inset-bottom));
+    }
+  }
 </style>
 </head>
 <body>
@@ -179,7 +219,7 @@
         <p>When the agent rests, it emits a <em class="accent-blue">call</em>.
         Sensors that hear the call <em class="accent-blue">resonate in blue</em>,
         marking the moving edge of its perception.</p>
-        <p>Switch to <em>cursor mode</em> to walk the field yourself — <em>click</em> to call.</p>
+        <p class="desktop-only">Switch to <em>cursor mode</em> to walk the field yourself — <em>click</em> to call.</p>
       </div>
     </div>
 
@@ -239,6 +279,14 @@
 
   const MODE = { AUTO: 'auto', CURSOR: 'cursor' };
   const STATE = { MOVING: 'moving', PAUSED: 'paused' };
+
+  // Mobile gate: stay in Auto mode permanently and skip all cursor-related
+  // interaction (mode toggle, M-key, click-to-call). Re-evaluated when the
+  // viewport crosses the breakpoint so a desktop → DevTools-mobile switch
+  // behaves predictably.
+  const mobileMQ = window.matchMedia('(max-width: 640px)');
+  let isMobile = mobileMQ.matches;
+  mobileMQ.addEventListener('change', (e) => { isMobile = e.matches; });
 
   const canvas = document.getElementById('stage');
   const ctx = canvas.getContext('2d');
@@ -565,20 +613,23 @@
       e.preventDefault();
       paused = !paused;
       pausedIndicator.classList.toggle('visible', paused);
-    } else if (e.code === 'KeyM') {
+    } else if (e.code === 'KeyM' && !isMobile) {
       setMode(mode === MODE.AUTO ? MODE.CURSOR : MODE.AUTO);
     }
   });
   modeBtn.addEventListener('click', () => {
+    if (isMobile) return;
     setMode(mode === MODE.AUTO ? MODE.CURSOR : MODE.AUTO);
   });
   window.addEventListener('mousemove', (e) => {
+    if (isMobile) return;
     cursor.x = e.clientX;
     cursor.y = e.clientY;
     cursor.lastMoveAt = performance.now();
     cursor.seen = true;
   });
   window.addEventListener('mousedown', (e) => {
+    if (isMobile) return;
     if (mode !== MODE.CURSOR || paused) return;
     if (e.target.closest('.mode-toggle')) return;
     emitCall(performance.now());
