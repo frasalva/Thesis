@@ -1,0 +1,400 @@
+1
+00:00:00,000 --> 00:00:04,860
+Hi there, I'm showing you in this video a real-time version of the visualization
+
+2
+00:00:04,860 --> 00:00:08,820
+model I'm working on this last month and this is a model that I'm utilizing quite
+
+3
+00:00:08,820 --> 00:00:13,380
+a lot to work with birdsongs and I actually began developing it as a
+
+4
+00:00:13,380 --> 00:00:18,660
+solution for birdsong visualization and analysis and this is the first 100%
+
+5
+00:00:18,660 --> 00:00:25,100
+real-time version that I created. I'm using the sloppy webcam that I have here
+
+6
+00:00:25,100 --> 00:00:31,260
+and the microphone it has as an audio source and in this version the model is
+
+7
+00:00:31,260 --> 00:00:35,180
+not designed to represent anything specific like I don't know specific
+
+8
+00:00:35,180 --> 00:00:39,020
+features in the spectrogram frequencies whatever it's kind of a general-purpose
+
+9
+00:00:39,020 --> 00:00:45,060
+one but it can actually do some cool stuff and some quite interesting thing
+
+10
+00:00:45,060 --> 00:00:50,120
+so basically what the model does is to interpret and translate the audio as
+
+11
+00:00:50,120 --> 00:00:54,840
+point and to distribute the points into 3d space like to create a special
+
+12
+00:00:54,840 --> 00:01:00,040
+images of the sound and these points end up creating this kind of
+
+13
+00:01:00,040 --> 00:01:07,300
+intricate layered networks and every point comes with with a subset of
+
+14
+00:01:07,300 --> 00:01:13,540
+information embedded on it so every point has a color and the color
+
+15
+00:01:13,540 --> 00:01:18,140
+indicates the most active frequency band at the moment of emission so it's not a
+
+16
+00:01:18,140 --> 00:01:23,580
+precise frequency measurement it tells you more or less where the most energy
+
+17
+00:01:23,580 --> 00:01:28,560
+is in the signal at every moment so it's like a frequency zone or tells you
+
+18
+00:01:28,560 --> 00:01:34,280
+where the sound is going. Another value is the amplitude value on top of every
+
+19
+00:01:34,280 --> 00:01:40,620
+point there is an emission time expressed in seconds on the bottom there
+
+20
+00:01:40,620 --> 00:01:46,880
+is a relative lifetime also expressed in seconds it's an animated value and in
+
+21
+00:01:46,880 --> 00:01:50,760
+this last version there is a new data tool on the left which is the spectral
+
+22
+00:01:50,760 --> 00:01:58,020
+centroid expressed in kilohertz and the spectral centroid is like the center of
+
+23
+00:01:58,020 --> 00:02:02,500
+mass of the spectrogram it's like an average of everything that's going on in
+
+24
+00:02:02,500 --> 00:02:07,420
+the spectrogram at a certain moment of time so basically every point now has
+
+25
+00:02:07,420 --> 00:02:12,540
+also the mean frequency of everything that is going on in the spectrogram and
+
+26
+00:02:12,540 --> 00:02:20,380
+higher values suggest a brighter signal while darker values indicates a lower
+
+27
+00:02:20,380 --> 00:02:28,900
+values indicate a darker one and yeah so you can tell how my usual voice range
+
+28
+00:02:28,900 --> 00:02:34,680
+my normal voice range stays at about 200 Hertz but I can try to
+
+29
+00:02:34,680 --> 00:02:44,800
+change the pitch with my voice so with some falsetto like and you can tell how
+
+30
+00:02:44,800 --> 00:02:49,160
+this reflects into the model with changes in colors and shape distribution
+
+31
+00:02:49,220 --> 00:02:54,500
+the shape of the points also so basically my voice is constantly shaping
+
+32
+00:02:54,500 --> 00:03:02,420
+and reshaping the model over time in in space and another feature that I devised
+
+33
+00:03:02,420 --> 00:03:07,400
+with this version is the possibility to save snapshots of the structure and this
+
+34
+00:03:07,400 --> 00:03:10,940
+is an extremely interesting thing so basically at any moment I am able to
+
+35
+00:03:10,940 --> 00:03:17,780
+freeze the real-time flow and have a create a still 3d model of it with all
+
+36
+00:03:17,840 --> 00:03:23,120
+the data embedded of it so I can try to have a snapshot now and see how it looks
+
+37
+00:03:23,120 --> 00:03:28,440
+like so yeah basically this is a 3d model of my voice we can call it that
+
+38
+00:03:28,440 --> 00:03:34,400
+you can tell how the different values are for every point the distribution the
+
+39
+00:03:34,400 --> 00:03:40,560
+different colors etc I can also navigate it a bit with this amazing zoom slider
+
+40
+00:03:40,560 --> 00:03:47,420
+that I build for the occasion and you can also tell how the normal range of my
+
+41
+00:03:47,420 --> 00:03:51,160
+voice has also higher frequency particles embedded on it which
+
+42
+00:03:51,160 --> 00:03:57,380
+basically are the SSD sounds that I do when I talk and it's interesting to see
+
+43
+00:03:57,380 --> 00:04:04,040
+how they are somehow sampled and inserted into the 3d model organically
+
+44
+00:04:04,040 --> 00:04:10,040
+so I can switch back to the real-time generation at any moment and basically
+
+45
+00:04:10,040 --> 00:04:17,240
+this is all data these are numbers data sets which can be saved and elaborated
+
+46
+00:04:17,260 --> 00:04:22,400
+in many different ways they can be put into libraries they can be analytically
+
+47
+00:04:22,400 --> 00:04:27,820
+compared they can be putting relationship one with the other and they
+
+48
+00:04:27,820 --> 00:04:34,540
+can also be represented in different ways into graph and such so for instance
+
+49
+00:04:34,540 --> 00:04:40,580
+in this version I built a couple of secondary graphs which are already into
+
+50
+00:04:40,580 --> 00:04:45,700
+the touch designer network so I can have another snapshot now and see how they
+
+51
+00:04:45,760 --> 00:04:52,920
+look like so yeah this is another 3d model of my voice and I built a graph
+
+52
+00:04:52,920 --> 00:04:58,720
+that puts in relationship amplitude and frequency over time so here we have the
+
+53
+00:04:58,720 --> 00:05:05,200
+amplitude values on the y-axis and the time window in which the snapshot has
+
+54
+00:05:05,200 --> 00:05:09,960
+been taken on the x-axis which is 10 seconds but it can be virtually any time
+
+55
+00:05:09,960 --> 00:05:14,320
+and the colored points are the frequency information for every point so
+
+56
+00:05:14,340 --> 00:05:19,300
+basically what you see here you see here this is the same thing it's just data
+
+57
+00:05:19,300 --> 00:05:25,420
+that is represented differently so basically you have a 3d model here with
+
+58
+00:05:25,420 --> 00:05:30,100
+additional XY and Z information for every point and you have the same data
+
+59
+00:05:30,100 --> 00:05:37,120
+here reported into a linear b-dimensional graph and you see how it
+
+60
+00:05:37,120 --> 00:05:41,580
+looks like and another graph that I built puts in relationship the
+
+61
+00:05:41,600 --> 00:05:47,520
+spectral centric values with the amplitude values and it's cool to see
+
+62
+00:05:47,520 --> 00:05:53,440
+how the brightness of the signal can more or less relate with its amplitude
+
+63
+00:05:53,440 --> 00:05:59,280
+so these are two possibilities of lots of possibilities that can be can be done
+
+64
+00:05:59,280 --> 00:06:05,880
+with this model which basically is not just a simple visualizer is more like it
+
+65
+00:06:05,880 --> 00:06:12,060
+can be a real-time audio analysis tool that can be used for a number of
+
+66
+00:06:12,060 --> 00:06:22,460
+different purposes and the users are quite they can be very much and yeah I'm
+
+67
+00:06:22,460 --> 00:06:27,460
+going to implement many other functions in the in the future work that I'm doing
+
+68
+00:06:27,460 --> 00:06:32,700
+on this I have already many ideas of what to do and yeah now I can try
+
+69
+00:06:32,700 --> 00:06:44,060
+something crazier with my voice like I can try to save a snapshot of this crap
+
+70
+00:06:44,060 --> 00:06:50,100
+and see how it looks like okay you can see the normal range of my voice you can
+
+71
+00:06:50,100 --> 00:06:55,360
+see my faceto range quite clearly and my whistle too that is embedded as a
+
+72
+00:06:55,360 --> 00:07:01,860
+structure like per se into the overall model and I can see how it looks like in
+
+73
+00:07:01,860 --> 00:07:07,980
+the graphs you can tell how my falsetto amplitude goes basically off scale in
+
+74
+00:07:07,980 --> 00:07:12,700
+the graph but you can also clearly detect all the episodes in that I did
+
+75
+00:07:12,700 --> 00:07:18,500
+mean my voice in the time dimension which is pretty cool and also I can see
+
+76
+00:07:18,500 --> 00:07:27,940
+how the spectral centroid and amplitude relates this model so yeah this is where
+
+77
+00:07:27,940 --> 00:07:36,380
+my work is the direction where my work is going at the moment and another very
+
+78
+00:07:36,380 --> 00:07:41,300
+cool thing that I'm trying to do with this model is to feed it any audio source
+
+79
+00:07:41,300 --> 00:07:45,540
+I can find because it can process every audio so basically whatever can produce
+
+80
+00:07:45,540 --> 00:08:03,020
+a sound can be fed into it so I can try maybe some drawing or an almonica or the ringtones of my cell phone
+
+81
+00:08:15,540 --> 00:08:40,420
+so this is basically how I'm wasting my time right now
+
+82
+00:08:40,420 --> 00:08:49,580
+yeah this is like the state of the art of my work and and this is what I'm
+
+83
+00:08:49,580 --> 00:08:55,420
+doing and as a further development on this model I'm going to introduce MIDI
+
+84
+00:08:55,420 --> 00:09:01,340
+so I'm going to implement MIDI on it and I'm very curious to see where it can go
+
+85
+00:09:01,340 --> 00:09:09,300
+because another project I'm very much involved now is the visual MIDI guitar
+
+86
+00:09:09,300 --> 00:09:17,140
+and I'm seriously interested what on seeing what can be achieved with these
+
+87
+00:09:17,140 --> 00:09:25,460
+different technologies put together and yeah I think also that when I be done
+
+88
+00:09:25,460 --> 00:09:32,220
+with all the development work I try to talk a bit more in depth about how these
+
+89
+00:09:32,220 --> 00:09:37,980
+models are actually built because the workflow is not really easy there are
+
+90
+00:09:37,980 --> 00:09:43,260
+many things many techniques going together at once and the touch designer
+
+91
+00:09:43,260 --> 00:09:50,340
+networks are rather colossal so it would require quite an effort to actually
+
+92
+00:09:50,340 --> 00:09:56,260
+explain everything and also recording quality now is not really great because
+
+93
+00:09:56,260 --> 00:10:02,340
+I'm going completely in real time and even if I have a rather powerful GPU is
+
+94
+00:10:02,340 --> 00:10:09,700
+barely holding everything together so I'm doing what I can anyway yeah I guess
+
+95
+00:10:09,700 --> 00:10:15,640
+that's it for now and if you want more of that you can like and subscribe as
+
+96
+00:10:15,640 --> 00:10:20,660
+they say since more is to come I'm mostly active on Instagram but every
+
+97
+00:10:20,660 --> 00:10:25,180
+now and then I come back to YouTube to post some development of my work I try
+
+98
+00:10:25,180 --> 00:10:30,300
+to be more regular here and post more stuff and maybe also some some more
+
+99
+00:10:30,300 --> 00:10:37,780
+creative thing and we'll see where it goes thanks a lot for watching and see
+
+100
+00:10:37,780 --> 00:10:40,540
+you soon bye
+

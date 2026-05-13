@@ -1,0 +1,202 @@
+:root {
+  --bg: #000;
+  --fg: #ffffff;
+  --line: rgba(255, 255, 255, 0.35);
+  --line-soft: rgba(255, 255, 255, 0.18);
+  --accent: #e4524a;
+  --accent-soft: rgba(228, 82, 74, 0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 24%),
+              linear-gradient(180deg, #050505 0%, #000 100%);
+  color: var(--fg);
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── HUD ───────────────────────────────────────────── */
+.hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+.hud span { opacity: 0.85; }
+.hud .center { letter-spacing: 0.04em; }
+
+/* ── Crosshair ─────────────────────────────────────── */
+.cross-h, .cross-v {
+  position: fixed;
+  pointer-events: none;
+}
+.cross-h {
+  left: 0; right: 0;
+  top: 50%;
+  border-top: 1px dashed var(--line);
+}
+.cross-v {
+  top: 0; bottom: 0;
+  left: 50%;
+  border-left: 1px dashed var(--line);
+}
+
+/* ── Compass ───────────────────────────────────────── */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.compass {
+  position: relative;
+  width: min(62vh, 62vw, 640px);
+  height: min(62vh, 62vw, 640px);
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.04), transparent 42%),
+              linear-gradient(180deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px;
+  background-position: 0 0, 0 0;
+}
+.compass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 38%, rgba(255,255,255,0.03) 40%, transparent 44%);
+}
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: inset 0 0 80px rgba(255,255,255,0.04), 0 0 120px rgba(255,255,255,0.06);
+  background: radial-gradient(circle at center, rgba(255,255,255,0.04), transparent 42%);
+}
+
+/* Arrow rotates around the compass center via --radius (set from JS on resize). */
+.arrow-orbit {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  transform: translate(-50%, -50%) rotate(0rad);
+  transition: transform 0.18s cubic-bezier(.3,.7,.3,1);
+}
+.arrow {
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 17px solid var(--accent);
+  transform: translate(-50%, calc(-50% - var(--radius)));
+  filter: drop-shadow(0 0 12px rgba(228,82,74,0.7));
+}
+
+/* Player (white) sits at center; traction (red) leads it in the direction of motion. */
+.player {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--fg);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 12px rgba(255,255,255,0.18);
+  transition: transform 0.18s cubic-bezier(.3,.7,.3,1), box-shadow 0.18s ease;
+  z-index: 2;
+}
+.traction {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid rgba(228,82,74,0.9);
+  box-shadow: 0 0 20px rgba(228,82,74,0.18);
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s cubic-bezier(.3,.7,.3,1), box-shadow 0.18s ease;
+  z-index: 3;
+  will-change: transform;
+}
+
+/* ── Minimap ───────────────────────────────────────── */
+.minimap-wrap {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 260px;
+  height: 162px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.85);
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(255,255,255,0.05);
+}
+.minimap-wrap canvas { display: block; width: 100%; height: 100%; }
+
+/* ── Mode toggle + frame ───────────────────────────── */
+.mode-toggle {
+  position: fixed;
+  left: 32px;
+  bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.mode-toggle:hover { opacity: 1; border-color: rgba(255,255,255,0.4); }
+.mode-toggle:focus { outline: none; opacity: 1; }
+.mode-toggle.cursor {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  opacity: 1;
+}
+.mode-toggle .key {
+  font-size: 10px;
+  opacity: 0.5;
+  letter-spacing: 0.18em;
+}
+.frame-corner {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.frame-corner.top-left     { top: 16px;    left: 16px;  border-right: none;  border-bottom: none; }
+.frame-corner.top-right    { top: 16px;    right: 16px; border-left: none;   border-bottom: none; }
+.frame-corner.bottom-left  { bottom: 16px; left: 16px;  border-right: none;  border-top: none; }
+.frame-corner.bottom-right { bottom: 16px; right: 16px; border-left: none;   border-top: none; }
+
+/* ── Reach pulse ───────────────────────────────────── */
+@keyframes reach {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(6); opacity: 0; }
+}
+.reach-pulse {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  transform: translate(-50%, -50%);
+  animation: reach 0.7s ease-out forwards;
+  pointer-events: none;
+}

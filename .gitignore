@@ -1,0 +1,10 @@
+# OS / editor junk
+.DS_Store
+.vscode/
+
+# Agent/tool directories
+.agents/
+.claude/
+
+# Oversized reference video (439 MB, exceeds GitHub's 100 MB per-file limit)
+bird-call_visualizer/reference/reference_LucioArese.mp4

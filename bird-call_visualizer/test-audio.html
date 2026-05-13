@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Step 2 — Audio Analysis Test</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    body { background: #111; color: #ccc; font-family: monospace; padding: 32px; }
+    h2   { color: #fff; margin-bottom: 20px; font-size: 14px; letter-spacing: .1em; }
+    label { display: block; margin-bottom: 8px; font-size: 12px; color: #888; }
+    input[type=file] { margin-bottom: 24px; font-size: 13px; color: #aaa; }
+    #status { font-size: 12px; color: #888; margin-bottom: 16px; min-height: 18px; }
+    #summary { color: #8cf; font-size: 12px; margin-bottom: 12px; }
+    pre    { font-size: 11px; line-height: 1.6; color: #9d9; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>STEP 2 — AUDIO ANALYSIS TEST</h2>
+  <label>Select a bird song file from assets/audio/ (WAV or MP3):</label>
+  <input type="file" id="picker" accept=".wav,.mp3">
+  <div id="status"></div>
+  <div id="summary"></div>
+  <pre id="output"></pre>
+
+  <script type="module">
+    import { analyzeAudio } from './src/audio.js';
+
+    const picker  = document.getElementById('picker');
+    const status  = document.getElementById('status');
+    const summary = document.getElementById('summary');
+    const output  = document.getElementById('output');
+
+    picker.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      status.textContent  = `Analyzing "${file.name}" …`;
+      summary.textContent = '';
+      output.textContent  = '';
+
+      const t0 = performance.now();
+      const arrayBuffer = await file.arrayBuffer();
+      const { points } = await analyzeAudio(arrayBuffer);
+      const elapsed = ((performance.now() - t0) / 1000).toFixed(2);
+
+      // Console output (check DevTools).
+      console.log(`[test] "${file.name}" → ${points.length} points in ${elapsed}s`);
+      console.log('[test] first 10 points:', points.slice(0, 10));
+
+      // Summarise the full dataset.
+      const ampValues  = points.map(p => p.amplitude);
+      const centValues = points.map(p => p.centroid);
+      const freqValues = points.map(p => p.dominantFreq);
+
+      const fmt2 = v => v.toFixed(4);
+      const fmtHz = v => `${Math.round(v)} Hz`;
+      const fmtKHz = v => `${v.toFixed(3)} kHz`;
+
+      status.textContent = `Done in ${elapsed}s`;
+      summary.innerHTML =
+        `Total points : <b>${points.length}</b><br>` +
+        `Duration     : <b>${points.at(-1).emissionTime.toFixed(2)}s</b><br>` +
+        `Amplitude    : min ${fmt2(Math.min(...ampValues))}  max ${fmt2(Math.max(...ampValues))}<br>` +
+        `Centroid     : min ${fmtKHz(Math.min(...centValues))}  max ${fmtKHz(Math.max(...centValues))}<br>` +
+        `Dom. freq    : min ${fmtHz(Math.min(...freqValues))}  max ${fmtHz(Math.max(...freqValues))}`;
+
+      // Print first 10 points to the page.
+      output.textContent = 'First 10 points:\n\n' +
+        points.slice(0, 10).map((p, i) =>
+          `[${String(i).padStart(2)}] ` +
+          `time=${p.emissionTime.toFixed(3)}s  ` +
+          `timeNorm=${p.timeNorm.toFixed(4)}  ` +
+          `amp=${p.amplitude.toFixed(4)}  ` +
+          `centroid=${p.centroid.toFixed(3)}kHz  ` +
+          `domFreq=${Math.round(p.dominantFreq)}Hz`
+        ).join('\n');
+    });
+  </script>
+</body>
+</html>

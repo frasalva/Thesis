@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Hand Symbiont — Perceive direction</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="cross-h"></div>
+  <div class="cross-v"></div>
+
+  <div class="hud">
+    <span>⌁ Hand Symbiont</span>
+    <span class="center">Perceive direction</span>
+    <span id="meta">— m · ◎ tracking</span>
+  </div>
+
+  <div class="stage">
+    <div class="compass" id="compass">
+      <div class="ring"></div>
+      <div class="arrow-orbit" id="arrowOrbit">
+        <div class="arrow"></div>
+      </div>
+      <div class="traction" id="traction"></div>
+      <div class="player"></div>
+    </div>
+  </div>
+
+  <div class="frame-corner top-left"></div>
+  <div class="frame-corner top-right"></div>
+  <div class="frame-corner bottom-left"></div>
+  <div class="frame-corner bottom-right"></div>
+
+  <div class="minimap-wrap">
+    <canvas id="minimap" width="520" height="324"></canvas>
+  </div>
+
+  <button id="modeToggle" class="mode-toggle" type="button">
+    <span class="label">◎ AUTO</span>
+    <span class="key">SPACE</span>
+  </button>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
